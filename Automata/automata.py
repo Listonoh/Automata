@@ -1,4 +1,4 @@
-import itertools
+# import itertools
 import json
 import re
 
@@ -10,61 +10,66 @@ class status:
         return f"state: {self.state}, position: {self.position}, text_version: {self.text_version} "
 
 
-
 class automaton:
-    def __init__(self, file):
-        with open(file, mode='r') as inp:
-            self.mess = json.load(inp)
-        print(self.mess)
-        self.size_of_window = self.mess["size_of_window"]
-        self.stats = [ status(self.mess["s0"][0], self.mess["s0"][1], 0)]
-
+    def __init__(self, file=""):
+        if file == "":
+            print(f"Loading clear automaton, \n Init State is 'st0' and window size is set to 1")
+            with open("clear_automaton.json", mode='r') as inp:  # load data from json file
+                self.mess = json.load(inp)    
+        else:
+            with open(file, mode='r') as inp:  # load data from json file
+                self.mess = json.load(inp)
+        print(f"Automaton loaded")
 
 
     def is_in_alphabet(self, ch):
-        for i in self.mess["alfabet"]:
-            if i == ch:
-                return True
+        if ch in self.mess["alfabet"]:  
+            return True
         return False
 
 
     def is_accepting_state(self, state):
-        for i in self.mess["sAcc"]:
-            if i == state:
-                return True
+        if state in self.mess["sAcc"]:
+            return True
         return False       
 
 
-    def __make_instruction(self, instruction, new_state, stat): #beware not functioning for window >1
+    def __make_instruction(self, instruction, new_state, stat):
         pos = stat.position
         end_of_pos = self.size_of_window + pos
 
-        if instruction == "MVR":
+        if instruction == "MVR": # move right
             s = status(new_state, pos + 1, stat.text_version)
-            self.stats.append( s)
+            self.stats.append(s)
             return
-        elif instruction == "RES":
+        elif instruction == "RES": # restart
             s = status(new_state, 0, stat.text_version)
-            self.stats.append( s)
+            self.stats.append(s)
             return
-        #matching rewritings for remove use "[]"
-        elif re.match(r"^\[.*\]$", instruction):
-            new_list = self.texts[stat.text_version].copy()
-            new_values = eval(instruction)
-            new_list[pos: end_of_pos] = new_values
+        elif re.match(r"^\[.*\]$", instruction):    #matching rewrites, for remove use "[]"
+            new_list = self.texts[stat.text_version].copy()     # new copy of curent state
+            new_values = eval(instruction)                      # making array from string
+            new_list[pos: end_of_pos] = new_values              # rewriting 
 
             self.texts.append(new_list)
             self.paths_of_stats.append(f"{self.paths_of_stats[stat.text_version]} -> \n {new_list}" )
             s = status(new_state, stat.position, len(self.texts) -1)
             self.stats.append(s)
             return
+        # else nothing its not deterministic
 
 
     def add_instruction(self, from_state, value, to_state, instruction):
-        for i in self.mess["instructions"][from_state][value]:
-            if i == [to_state, instruction]:
-                return
+        """
+        Does not rewrite if exist, see replace_instruction
+        Takes [from_state value -> state instruction]
+        return False if instruction exists / True otherwise
+        """
+
+        if [to_state, instruction] in self.mess["instructions"][from_state][value]:
+            return False
         self.mess["instructions"][from_state][value].append([to_state, instruction])
+        return True
 
     def replace_instructions(self, from_state, value, to_state, instruction):
         self.mess["instructions"][from_state][value] = [[to_state, instruction]]
@@ -97,9 +102,18 @@ class automaton:
         return newtext
 
 
+    def prety_print(self, index):
+        pass
+
+
     def iterateText(self, text):
         self.texts = [self.__concat_text(text)]
-        self.paths_of_stats = [ str(self.texts[0]) ]
+        self.paths_of_stats = [ 0 ]
+
+        starting_status = status(self.mess["s0"][0], self.mess["s0"][1], 0)     # implicitly set to "st0" and 0 
+        self.stats = [starting_status]
+        self.size_of_window = self.mess["size_of_window"]                       # implicitly set to 1
+
         print(self.texts[0])
         while True:
             try:
@@ -114,9 +128,11 @@ class automaton:
                     print(f"remaining tuples = {self.stats}")
                     print(f"number of copies of text = {len(self.texts)}")
                     print(f"path: \n {str(self.paths_of_stats[s.text_version])}")
+                    self.prety_print(s.text_version)
                     return True
                 elif self.stats.__len__() == 0:
                     return False
+
 
 
     def print_instructions(self):
