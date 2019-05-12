@@ -3,6 +3,7 @@ import json
 import re
 
 class status:
+    a
     def __init__(self, state, position, text_version):
         self.state, self.position, self.text_version = state, position, text_version
 
@@ -23,9 +24,12 @@ class automaton:
 
 
     def is_in_alphabet(self, ch):
-        if ch in self.mess["alfabet"]:  
+        if ch in self.mess["alphabet"]:  
             return True
         return False
+
+    def add_to_alphabet(self, ch):
+        if ch in self.mess["alphabet"]
 
 
     def is_accepting_state(self, state):

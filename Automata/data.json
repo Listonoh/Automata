@@ -1,5 +1,5 @@
 { 	"s0" : ["st0", 0],
-	"alfabet" : ["a", "b", "[a,b]"],
+	"alphabet" : ["a", "b", "[a,b]"],
 	"sAcc" : ["st0"],
 	"size_of_window": 1,
 	"name": "", 

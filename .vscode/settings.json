@@ -1,3 +1,4 @@
 {
-    "python.pythonPath": "web_django\\Scripts\\python.exe"
+    "python.pythonPath": "web_django\\Scripts\\python.exe",
+    "python.linting.enabled": false
 }
