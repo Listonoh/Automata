@@ -1,6 +1,8 @@
 # import itertools
 import json
 import re
+import os
+import sys
 from colorama import Fore, Back, Style, init
 init(autoreset=True)
 class status:
@@ -17,7 +19,9 @@ class automaton:
         print("------------Loading--------------")
         if file == "":
             print(f"Loading clear automaton, \n Init State is 'st0' and window size is set to 1 \n Accepting state is 'st0' ")
-            with open("clear_automaton.json", mode='r') as inp:  # load data from json file
+            path = os.path.join(sys.path[0], 'clear_automaton.json')
+            print(path)
+            with open(path , mode='r') as inp:  # load data from json file
                 self.mess = json.load(inp)    
         else:
             with open(file, mode='r') as inp:  # load data from json file
@@ -31,10 +35,15 @@ class automaton:
             return True
         return False
 
-    def add_to_alphabet(self, ch): # going to be internal
-        if not ch in self.mess["alphabet"]:
-            self.mess["alphabet"].append(ch)
+    def add_to_alphabet(self, *chars): # going to be internal
+        for ch in chars:
+            if not ch in self.mess["alphabet"]:
+                self.mess["alphabet"].append(ch)
 
+    def add_accepting_state(self, *states):
+        for st in states:
+            if not st in self.mess["sAcc"]:
+                self.mess["sAcc"].append(st)
 
     def is_accepting_state(self, state):
         if state in self.mess["sAcc"]:
@@ -50,7 +59,15 @@ class automaton:
             s = status(new_state, pos + 1, stat.text_version, stat)
             self.stats.append(s)
             return
-        elif instruction == "RES": # restart
+        if instruction == "MVL": # move right
+            s = status(new_state, pos - 1, stat.text_version, stat)
+            self.stats.append(s)
+            return
+        elif instruction == "Restart": # restart
+            s = status(new_state, 0, stat.text_version, stat)
+            self.stats.append(s)
+            return
+        elif instruction == "Accept": # restart
             s = status(new_state, 0, stat.text_version, stat)
             self.stats.append(s)
             return
@@ -66,12 +83,14 @@ class automaton:
         # else nothing its not deterministic
 
 
-    def add_instruction(self, from_state, value, to_state, instruction):
+    def add_instruction(self, from_state, value, to_state, instruction, strtolist=False):
         """
         Does not rewrite if exist, see replace_instruction
         modify delta[from_state, value] -> [state, instruction]
         return False if instruction exists / True otherwise
         """
+        if strtolist:
+            value = str(list(value))
         if not from_state in self.mess["instructions"]:
             self.mess["instructions"][from_state] = {value : []}
         if not value in self.mess["instructions"][from_state]:
@@ -87,6 +106,12 @@ class automaton:
 
     def __move(self, window, stat):
         posibilites = self.mess["instructions"][stat.state]
+        if "['*']" in posibilites:    #for all posibilites do this
+            posibility = posibilites["['*']"][0]
+            print(f">instruction: * -> new_state: ***")
+            print(posibility[1])
+            print(posibility[0])
+            self.__make_instruction(posibility[1], posibility[0], stat)
         for posibility in posibilites[window]:
             print(f">instruction: {window} -> new_state: {posibility[0]}, instruction: {posibility[1]}  " )
             self.__make_instruction(posibility[1], posibility[0], stat)
@@ -119,14 +144,14 @@ class automaton:
         else:
             self.prety_print(stat.father)
             text = self.texts[stat.text_version]
-            i=1
-            b, e = stat.position, stat.position + self.size_of_window +1
+            i=0
+            b, e = stat.position, stat.position + self.size_of_window 
             print("[", end="")
             while i < len(text):
-                if b < i and i < e:
-                    print(Fore.RED + str(i), end = "")
+                if b <= i and i < e:
+                    print(Fore.RED + str(text[i]), end = "")
                 else:
-                    print(str(i), end = "")
+                    print(str(text[i]), end = "")
                 i+=1
                 if i < len(text):
                     print(", ", end="")
@@ -141,7 +166,7 @@ class automaton:
         starting_status = status(self.mess["s0"][0], self.mess["s0"][1], 0)     # implicitly set to "st0" and 0 
         self.stats = [starting_status]
         self.size_of_window = self.mess["size_of_window"]                       # implicitly set to 1
-
+        #self.print_instructions()
         print(self.texts[0])
         while True:
             try:
@@ -168,7 +193,7 @@ class automaton:
                 print(f" \"{value}\" : [", end = "")
                 for instruct in self.mess["instructions"][state][value]:
                     print(f"{instruct}", end = "")
-                print("]", end ="")
+                print("]")
             print(">")
 
 

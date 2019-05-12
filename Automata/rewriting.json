@@ -2,9 +2,9 @@
 	"alphabet" : ["['0']", "['1']"],
 	"sAcc" : ["st0"],
 	"size_of_window": 2,
-	"name": "", 
-	"type": "",
-	"doc_string" : "to co je v pythonu",
+	"name": "test rewriting", 
+	"type": "Rewriting",
+	"doc_string" : "testing rewriting and window size 2",
 	"instructions" : 	
 	{ 	
 		"st0": { 
