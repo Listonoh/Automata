@@ -1,6 +1,6 @@
 { 	"s0" : ["st0", 0],
 	"alphabet" : [],
-	"sAcc" : [],
+	"sAcc" : ["st0"],
 	"size_of_window": 1,
 	"name": "Clear automaton", 
 	"type": "None",
