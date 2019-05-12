@@ -1,6 +1,9 @@
 from automata import automaton
+import sys
 
-a = automaton()
+# accept language { an bn c | n >= 0 } union { an b2n d | n >= 0}
+
+a = automaton( out=3)
 a.mess["size_of_window"]  = 3
 a.mess["s0"] = ["q0", 0]
 a.add_to_alphabet("#", "$", "a", "b", "c", "d")
@@ -26,6 +29,12 @@ a.add_instruction("qc", "bbb", "qc", "MVL", strtolist=True)
 a.add_instruction("qc", "abb", "qr", "['b']", strtolist=True)
 a.add_instruction("qd", "bbd", "qd", "MVL", strtolist=True)
 a.add_instruction("qd", "bbb", "qd", "MVL", strtolist=True)
-a.add_instruction("qd", "bbb", "qr", "[]", strtolist=True)
+a.add_instruction("qd", "abb", "qr", "[]", strtolist=True)
 
-a.iterateText("#aaabbbc$")
+print(a.iterateText("#aaabbbc$"))
+sys.stdin.readline()
+print(a.iterateText("#aaabbbbbbd$"))
+sys.stdin.readline()
+print(a.iterateText("#aaabbbbb$"))
+
+

@@ -15,10 +15,11 @@ class status:
 
 
 class automaton:
-    def __init__(self, file=""):
-        print("------------Loading--------------")
+    def __init__(self, file="", out=3):
+        self.out = out
+        print("------------Loading--------------") if self.out % 2 == 0 else None
         if file == "":
-            print(f"Loading clear automaton, \n Init State is 'st0' and window size is set to 1 \n Accepting state is 'st0' ")
+            print(f"Loading clear automaton, \n Init State is 'st0' and window size is set to 1 \n Accepting state is 'st0' ") if self.out % 2 == 0 else None
             path = os.path.join(sys.path[0], 'clear_automaton.json')
             print(path)
             with open(path , mode='r') as inp:  # load data from json file
@@ -26,8 +27,8 @@ class automaton:
         else:
             with open(file, mode='r') as inp:  # load data from json file
                 self.mess = json.load(inp)
-        print(f"Automaton loaded")
-        print("----------------------------------")
+        print(f"Automaton loaded") if self.out % 2 == 0 else None
+        print("----------------------------------") if self.out % 2 == 0 else None
 
 
     def is_in_alphabet(self, ch):
@@ -108,14 +109,12 @@ class automaton:
         posibilites = self.mess["instructions"][stat.state]
         if "['*']" in posibilites:    #for all posibilites do this
             posibility = posibilites["['*']"][0]
-            print(f">instruction: * -> new_state: ***")
-            print(posibility[1])
-            print(posibility[0])
+            print(f">instruction: * -> new_state: ***") if self.out % 2 == 0 else None
             self.__make_instruction(posibility[1], posibility[0], stat)
         for posibility in posibilites[window]:
-            print(f">instruction: {window} -> new_state: {posibility[0]}, instruction: {posibility[1]}  " )
+            print(f">instruction: {window} -> new_state: {posibility[0]}, instruction: {posibility[1]}  " ) if self.out % 2 == 0 else None
             self.__make_instruction(posibility[1], posibility[0], stat)
-        print("----------------------------------", end="\n\n")
+        print("----------------------------------", end="\n\n") if self.out % 2 == 0 else None
             
 
     def __get_window(self, text, position):
@@ -146,40 +145,39 @@ class automaton:
             text = self.texts[stat.text_version]
             i=0
             b, e = stat.position, stat.position + self.size_of_window 
-            print("[", end="")
+            print("[", end="") if self.out % 3 == 0 else None
             while i < len(text):
                 if b <= i and i < e:
-                    print(Fore.RED + str(text[i]), end = "")
+                    print(Fore.RED + str(text[i]), end = "") if self.out % 3 == 0 else None
                 else:
-                    print(str(text[i]), end = "")
+                    print(str(text[i]), end = "") if self.out % 3 == 0 else None
                 i+=1
                 if i < len(text):
-                    print(", ", end="")
-            print("]")
+                    print(", ", end="") if self.out % 3 == 0 else None
+            print("]") if self.out % 3 == 0 else None
 
 
 
     def iterateText(self, text):
         self.texts = [self.__concat_text(text)]
         self.paths_of_stats = [ [0] ]
-
         starting_status = status(self.mess["s0"][0], self.mess["s0"][1], 0)     # implicitly set to "st0" and 0 
         self.stats = [starting_status]
         self.size_of_window = self.mess["size_of_window"]                       # implicitly set to 1
         #self.print_instructions()
-        print(self.texts[0])
+        print(self.texts[0]) if self.out % 2 == 0 else None
         while True:
             try:
                 s = self.stats.pop()
-                print(f"     > taking status : {s}")
+                print(f"     > taking status : {s}") if self.out % 2 == 0 else None
                 window = self.__get_window(self.texts[s.text_version], s.position)
-                print(f" text: {self.texts[s.text_version]}")
-                print(f" window: {window}")
+                print(f" text: {self.texts[s.text_version]}") if self.out % 2 == 0 else None
+                print(f" window: {window}") if self.out % 2 == 0 else None
                 self.__move(window, s)
             except:
                 if self.is_accepting_state(s.state):
-                    print(f"remaining tuples = {self.stats}")
-                    print(f"number of copies of text = {len(self.texts)}")
+                    print(f"remaining tuples = {self.stats}") if self.out % 2 == 0 else None
+                    print(f"number of copies of text = {len(self.texts)}") if self.out % 2 == 0 else None
                     self.prety_print(s)
                     return True
                 elif self.stats.__len__() == 0:
