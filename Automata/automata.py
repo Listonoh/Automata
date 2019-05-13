@@ -15,15 +15,19 @@ class status:
 
 
 class automaton:
+
+    def clear(self):
+        print(f"Loading clear automaton, \n Init State is 'st0' and window size is set to 1 \n Accepting state is 'st0' ") if self.out % 2 == 0 else None
+        path = os.path.join(sys.path[0], 'clear_automaton.json')
+        with open(path , mode='r') as inp:  # load data from json file
+            self.mess = json.load(inp) 
+
+
     def __init__(self, file="", out=3):
         self.out = out
         print("------------Loading--------------") if self.out % 2 == 0 else None
         if file == "":
-            print(f"Loading clear automaton, \n Init State is 'st0' and window size is set to 1 \n Accepting state is 'st0' ") if self.out % 2 == 0 else None
-            path = os.path.join(sys.path[0], 'clear_automaton.json')
-            print(path)
-            with open(path , mode='r') as inp:  # load data from json file
-                self.mess = json.load(inp)    
+            self.clear()  
         else:
             with open(file, mode='r') as inp:  # load data from json file
                 self.mess = json.load(inp)
@@ -207,5 +211,4 @@ class automaton:
                     return False
         return True
     
-    def clear(self):
-        self.mess = {}
+ 

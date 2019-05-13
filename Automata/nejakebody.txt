@@ -1,14 +1,25 @@
-- k cemu je to dobre
+- k cemu je to dobre,  
+    nejaky priklad
 
 tridy rrww rrw rww r ...
 
-moznosti zapisu
+nejak rozepsat typy ktere pak program kontroluje a co jsou zac
 
 
-
-
+web rozhrani
+    moznost vyzkouset automaty
+        vypsat cestu, volby stavu, 
+    nahrat vlastni automat
+    vypsat vsechny slova prijimane automatem o delce n 
 
 Dokumentace 
     co knihovna umi/bude umet
     vytvareni novych automatu
+    kontrola automatu jestly odpovidaji typum co maji v jsonu
+        jestli je deterministicky
+        r rr rrw ...
+        prave linearni ...
+
+
+    
     
