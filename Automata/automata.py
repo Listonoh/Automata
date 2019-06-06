@@ -3,7 +3,7 @@ import json
 import re
 import os
 import sys
-from colorama import Fore, Back, Style, init
+from colorama import Fore, init
 init(autoreset=True)
 class status:
     def __init__(self, state, position, text_version, father=None):
@@ -100,7 +100,7 @@ class automaton:
             self.mess["instructions"][from_state] = {value : []}
         if not value in self.mess["instructions"][from_state]:
             self.mess["instructions"][from_state][value] = []
-            
+
         if [to_state, instruction] in self.mess["instructions"][from_state][value]:
             return False
         self.mess["instructions"][from_state][value].append([to_state, instruction])
@@ -210,5 +210,3 @@ class automaton:
                 if len(self.mess["instructions"][state][value]) > 1:
                     return False
         return True
-    
- 
