@@ -1,9 +1,15 @@
-# import itertools
+import itertools
 import json
 import re
 import os
 import sys
+<<<<<<< Updated upstream
 from colorama import Fore, init
+=======
+from colorama import Fore, Back, Style, init
+
+
+>>>>>>> Stashed changes
 init(autoreset=True)
 class status:
     def __init__(self, state, position, text_version, father=None):
@@ -55,6 +61,15 @@ class automaton:
             return True
         return False       
 
+
+    def get_words_of_lenght(self, lenght=5, count=20):
+        retarr = []
+        for posibility in itertools.product(self.mess["alphabet"], lenght):
+            if True:
+                retarr.append(posibility)
+            if len(retarr) >= count:
+                return retarr
+        return retarr
 
     def __make_instruction(self, instruction, new_state, stat):
         pos = stat.position
