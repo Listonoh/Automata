@@ -3,13 +3,9 @@ import json
 import re
 import os
 import sys
-<<<<<<< Updated upstream
-from colorama import Fore, init
-=======
 from colorama import Fore, Back, Style, init
 
 
->>>>>>> Stashed changes
 init(autoreset=True)
 class status:
     def __init__(self, state, position, text_version, father=None):
