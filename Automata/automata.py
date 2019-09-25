@@ -6,7 +6,7 @@ import sys
 from colorama import Fore, init
 init(autoreset=True)
 class status:
-    def __init__(self, state, position, text_version, father=None):
+    def __init__(self, state, position:int, text_version, father=None):
         self.state, self.position, self.text_version = state, position, text_version
         self.father = father
 
@@ -20,14 +20,14 @@ class automaton:
         print(f"Loading clear automaton, \n Init State is 'st0' and window size is set to 1 \n Accepting state is 'st0' ") if self.out % 2 == 0 else None
         path = os.path.join(sys.path[0], 'clear_automaton.json')
         with open(path , mode='r') as inp:  # load data from json file
-            self.mess = json.load(inp) 
+            self.mess = json.load(inp)
 
 
     def __init__(self, file="", out=3):
         self.out = out
         print("------------Loading--------------") if self.out % 2 == 0 else None
         if file == "":
-            self.clear()  
+            self.clear()
         else:
             with open(file, mode='r') as inp:  # load data from json file
                 self.mess = json.load(inp)
@@ -36,7 +36,7 @@ class automaton:
 
 
     def is_in_alphabet(self, ch):
-        if ch in self.mess["alphabet"]:  
+        if ch in self.mess["alphabet"]:
             return True
         return False
 
@@ -53,7 +53,7 @@ class automaton:
     def is_accepting_state(self, state):
         if state in self.mess["sAcc"]:
             return True
-        return False       
+        return False
 
 
     def __make_instruction(self, instruction, new_state, stat):
@@ -79,7 +79,7 @@ class automaton:
         elif re.match(r"^\[.*\]$", instruction):    #matching rewrites, for remove use "[]"
             new_list = self.texts[stat.text_version].copy()     # new copy of curent state
             new_values = eval(instruction)                      # making array from string
-            new_list[pos: end_of_pos] = new_values              # rewriting 
+            new_list[pos: end_of_pos] = new_values              # rewriting
 
             self.texts.append(new_list)
             s = status(new_state, stat.position, len(self.texts) -1, stat)
@@ -119,7 +119,6 @@ class automaton:
             print(f">instruction: {window} -> new_state: {posibility[0]}, instruction: {posibility[1]}  " ) if self.out % 2 == 0 else None
             self.__make_instruction(posibility[1], posibility[0], stat)
         print("----------------------------------", end="\n\n") if self.out % 2 == 0 else None
-            
 
     def __get_window(self, text, position):
         end_of_pos = position + self.size_of_window
@@ -148,7 +147,7 @@ class automaton:
             self.prety_print(stat.father)
             text = self.texts[stat.text_version]
             i=0
-            b, e = stat.position, stat.position + self.size_of_window 
+            b, e = stat.position, stat.position + self.size_of_window
             print("[", end="") if self.out % 3 == 0 else None
             while i < len(text):
                 if b <= i and i < e:
@@ -165,7 +164,7 @@ class automaton:
     def iterateText(self, text):
         self.texts = [self.__concat_text(text)]
         self.paths_of_stats = [ [0] ]
-        starting_status = status(self.mess["s0"][0], self.mess["s0"][1], 0)     # implicitly set to "st0" and 0 
+        starting_status = status(self.mess["s0"][0], self.mess["s0"][1], 0)     # implicitly set to "st0" and 0
         self.stats = [starting_status]
         self.size_of_window = self.mess["size_of_window"]                       # implicitly set to 1
         #self.print_instructions()
@@ -201,7 +200,7 @@ class automaton:
 
     def save_instructions(self, to):
         with open(to, "w") as to_file:
-            json.dump(self.mess, to_file)  
+            json.dump(self.mess, to_file)
 
 
     def is_deterministic(self):
