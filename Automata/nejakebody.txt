@@ -1,4 +1,4 @@
-- k cemu je to dobre,  
+- k cemu je to dobre,
     nejaky priklad
 
 tridy rrww rrw rww r ...
@@ -8,11 +8,11 @@ nejak rozepsat typy ktere pak program kontroluje a co jsou zac
 
 web rozhrani
     moznost vyzkouset automaty
-        vypsat cestu, volby stavu, 
+        vypsat cestu, volby stavu,
     nahrat vlastni automat
-    vypsat vsechny slova prijimane automatem o delce n 
+    vypsat vsechny slova prijimane automatem o delce n
 
-Dokumentace 
+Dokumentace
     co knihovna umi/bude umet
     vytvareni novych automatu
     kontrola automatu jestly odpovidaji typum co maji v jsonu
@@ -21,5 +21,3 @@ Dokumentace
         prave linearni ...
 
 
-    
-    

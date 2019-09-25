@@ -1,7 +1,7 @@
 from automata import automaton
 import sys
 
-# accept language { an bn c | n >= 0 } union { an b2n d | n >= 0}
+# accept language { a^n b^n c | n >= 0 } union { a^n b^2n d | n >= 0}
 
 a = automaton( out=3)
 a.mess["size_of_window"]  = 3
@@ -36,5 +36,3 @@ sys.stdin.readline()
 print(a.iterateText("#aaabbbbbbd$"))
 sys.stdin.readline()
 print(a.iterateText("#aaabbbbb$"))
-
-

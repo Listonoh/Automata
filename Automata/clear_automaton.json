@@ -2,11 +2,8 @@
 	"alphabet" : [],
 	"sAcc" : ["st0"],
 	"size_of_window": 1,
-	"name": "Clear automaton", 
+	"name": "Clear automaton",
 	"type": "None",
 	"doc_string" : "Some documentation for this automaton. This is clear automaton",
-	"instructions" : 	
-	{ 	
-		
-	}
+	"instructions" :{}
 }
