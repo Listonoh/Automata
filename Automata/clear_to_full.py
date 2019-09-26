@@ -4,9 +4,9 @@ import sys
 # accept language { a^n b^n c | n >= 0 } union { a^n b^2n d | n >= 0}
 
 a = automaton( out=3)
-a.mess["size_of_window"]  = 3
-a.mess["s0"] = ["q0", 0]
-a.add_to_alphabet("#", "$", "a", "b", "c", "d")
+a.mess["size_of_window"]  = 3 
+a.mess["s0"] = ["q0", 0]  #seting starting state and position
+a.add_to_alphabet("#", "$", "a", "b", "c", "d") 
 
 a.add_accepting_state("Accept")
 
@@ -30,7 +30,7 @@ a.add_instruction("qc", "abb", "qr", "['b']", strtolist=True)
 a.add_instruction("qd", "bbd", "qd", "MVL", strtolist=True)
 a.add_instruction("qd", "bbb", "qd", "MVL", strtolist=True)
 a.add_instruction("qd", "abb", "qr", "[]", strtolist=True)
-
+print(a.is_deterministic())
 print(a.iterateText("#aaabbbc$"))
 sys.stdin.readline()
 print(a.iterateText("#aaabbbbbbd$"))
