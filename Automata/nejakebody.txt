@@ -1,5 +1,13 @@
+<<<<<<< HEAD
 - k cemu je to dobre,
     nejaky priklad
+=======
+- k cemu jsou dobre restartujici automaty,  
+    nejaky priklad?
+
+k cemu je to co delam 
+    priklad zapisu toho prikladu vise
+>>>>>>> af4ab5b46bfe0ce15b6b933b0269c094ca96d1fb
 
 tridy rrww rrw rww r ...
 

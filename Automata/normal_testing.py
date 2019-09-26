@@ -11,4 +11,4 @@ print(f"> deterministic: {aut1.is_deterministic()}")
 text = "baa[a,b]aba"
 print(f"iteratin {text}")
 print("---------------------")
-print(aut1.iterateText(text))
+print(aut1.iterate_text(text))
