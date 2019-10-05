@@ -1,0 +1,177 @@
+\documentclass{article}
+
+\usepackage[utf8]{inputenc}
+\usepackage{ wasysym }
+\usepackage{listings}
+
+\lstset{
+    inputencoding=utf8,
+    extendedchars=true,
+    literate=%
+    {á}{{\'a}}1
+    {č}{{\v{c}}}1
+    {ď}{{\v{d}}}1
+    {é}{{\'e}}1
+    {ě}{{\v{e}}}1
+    {í}{{\'i}}1
+    {ň}{{\v{n}}}1
+    {ó}{{\'o}}1
+    {ř}{{\v{r}}}1
+    {š}{{\v{s}}}1
+    {ť}{{\v{t}}}1
+    {ú}{{\'u}}1
+    {ů}{{\r{u}}}1
+    {ý}{{\'y}}1
+    {ž}{{\v{z}}}1
+    {Á}{{\'A}}1
+    {Č}{{\v{C}}}1
+    {Ď}{{\v{D}}}1
+    {É}{{\'E}}1
+    {Ě}{{\v{E}}}1
+    {Í}{{\'I}}1
+    {Ň}{{\v{N}}}1
+    {Ó}{{\'O}}1
+    {Ř}{{\v{R}}}1
+    {Š}{{\v{S}}}1
+    {Ť}{{\v{T}}}1
+    {Ú}{{\'U}}1
+    {Ů}{{\r{U}}}1
+    {Ý}{{\'Y}}1
+    {Ž}{{\v{Z}}}1
+}
+
+\title{ Ročníkový projekt: Knihovna pro testování lehkých restartujících automatů a webové prostředí}
+\author{Jan Urban }
+\date{October 2019}
+
+\begin{document}
+
+\maketitle
+
+Tato práce pojednává o tvorbě knihovny pro práci s restartujícími automaty 
+\subsection{Příklad použití restartujících automatů}
+Příklad od lingvistů, kde restartující automat mohou použít na redukční analýzu věty:
+
+\begin{verbatim}
+"Trosky zaměstnance, který tam plnil své úkoly, zcela zavalily"
+"Trosky zaměstnance, který plnil své úkoly, zcela zavalily"
+"Trosky zaměstnance, který plnil úkoly, zcela zavalily"
+"Trosky zaměstnance zcela zavalily"
+"Trosky zaměstnance zavalily"
+\end{verbatim}
+
+Což je korektní věta a z toho vyplývá, že počáteční věta je syntakticky správná. Na rozdíl od "Trosky zavalily" která je věta neúplná. Stejně nekorektní (neúplná je následující větev úprav)
+
+\begin{verbatim}
+	"Trosky zaměstnance zcela zavalily"
+	"Trosky zcela zavalily"
+\end{verbatim}
+
+Z čehož je už možné zjistit že věta je špatně, nebo po další redukci na "Trosky zavalily"
+
+\section{Třídy restartujících automatů}
+	\subsection{RRWW}
+	Restartující automat je n-tice $M =  (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, Q_A, Q_R)$.
+	\begin{itemize}
+		\item  $Q$ je konečná množina stavů
+		\item  $\Sigma  \ a \ \Gamma$ jsou konečné množiny symbolů, vstupní abeceda a pracovní abeceda v tomto pořadí, pro které platí že sigma subset of gamma.
+		\item  $k$ je nezáporné číslo udávající velikost dopředného okna, kolik znaků před hlavu automatu vidíme. (neboli velikost celého okna je k+1)
+		\item  $I$ je konečná množina pravidel následujících tří typů:
+			\begin{enumerate}
+				\item $(q, au) \to (q',MVR)$ nebo $(q, au) \to (q',MVL)$
+				\item $(q, au)\to(q', Rewrite(v))$
+				\item $(q, au) \to Restart$
+			\end{enumerate}
+		\item  $q_0$ je počáteční stav a platí $q_0 \in Q$
+		\item  $Q_A$ jsou akceptující stavy $Q_A \subseteq Q$
+		\item  $Q_R$ jsou odmítající stavy $Q_R \subseteq Q$
+		\item  První symbol je normálně \cent (v mém případě volím \# - dá se lépe najít na klávesnici) a posledním symbolem je \$ u dané pásky/slova
+	\end{itemize}
+
+	$Q$ je rozdělena do dvou množin a to do:
+	1. nekoncové stavy $Q - (Q_A \cup Q_R)$ které mají alespoň jedno pravidlo pro každý vstup do kterého se mohou dostat
+	2. koncové stavy $Q_A \cup Q_R$ které ukončují celou práci automatu
+
+		\subsubsection{Něco více o pravidlech}
+		1. $MVR$ - M změní stav na $q'$ a posune hlavu doprava na další symbol (symbol nemusí být nutně jedno písmeno nebo znak, ale klidně nějaká n-tice znaků)
+		2. $(q, au)\to(q', Rewrite(v))$ - přepíše $au$ na $v$, kde $v$ je kratší než $au$. To se docílí smazáním alespoň jednoho symbolu a možným nahrazením dalších symbolů z $au$
+		3.  $Restartuj$ změní stav na počáteční a přesune hlavu na začátek pásky, tak že první znak v okně bude levá zarážka.
+
+	\subsection{RRW}
+	Vychází z RRWW-automatu ale má totožnou pracovní abecedu s vstupní abecedou
+	\subsection{RR}
+	Vychází z RRW-automatu, ale zakazuje přepisovat, tedy může jen mazat
+	\subsection{R}
+	Vychází z RR automatu, ale restartuje se ihned po přepsání (smazání)
+	\subsection{RWW}
+	Vychází z RRWW automatu, ale po přepsání se ihned restartuje
+
+\section{Jaké typy automatů program rozpozná}
+
+	\subsection{Determinismus}
+	projde všechny instrukce a pokud má každá maximálně jednu pravou stranu tak je deterministický (nebo má jen hvězdičku která odpovídá všem možnostem a ta má jen jednu pravou stranu)
+
+	\subsection{možno doplnit monotonii, a rozpoznávání tříd restartujících automatů}
+\section{Webové prostředí}
+- Možnost zadání automatu buď v textové formě nebo nahráním souboru.
+- Vypsat přijímané slova do nějaké velikosti zadané uživatelem.
+- Otestovat zda dané slovo je přijímáno a jak bylo přijato (přes jaké stavy ...)
+- nějaká možnost si zapsat program instrukcemi podporované pythonem a mojí knihovničkou
+	- nejspíše nějakou webovou konzolí
+- ptát se co to je za automat
+- vybírat možnosti výstupu (vypsat celou cestu graficky, vypsat jen stavy)
+
+\section{Jak funguje tento program / automat}
+
+Tento automat je nedeterministický z důvodů že musí umět přijímat i nedeterministické automaty a je zásobníkového typu. Tedy rozhoduje se zda přijme, nebo nepřijme dané slovo na základě stavu automatu po vyprázdnění zásobníku.
+
+\subsection{Instrukce automatu}
+
+Tento automat implementuje několik instrukcí:
+
+1.  MVR (move right, posun doprava)
+
+2.  MVL (move left, posun doleva)
+
+3.  Restart
+
+4.  Accept (přijmi, vlastně restart)
+
+5.  “[ ‘x’ ]” (přepiš svojí pozici na “x”)
+
+
+\subsubsection{Jak přidat pravidla/instrukce}
+
+\begin{lstlisting}[language=Python, caption=Příklad použití]
+from automata import automaton
+a = automaton()
+
+a.mess["size_of_window"] = 3 # velikost okna bude 3
+
+# počáteční stav a počáteční pozice okna
+a.mess["s0"] = ["q0", 0]
+
+# přidání abecedy
+a.add_to_alphabet("#", "$", "a", "b", "c", "d")
+
+# přidání akceptujícího stavu (v našem případě "Accept")
+a.add_accepting_state("Accept")
+
+# přidání pravidla (q0, #ab) -> (q0, MVR)
+# /neboli ze stavu q0 a po přečtení "#ab" přejde
+# automat do stavu q0 a posune se o jednu pozici doprava
+# strtolist=True udává zda se přečtené data mají převést
+# do listu tedy každý znak odpovídá jednomu
+# symbolu abecedy -> ["#","a","b"]
+a.add_instruction("q0", "#ab", "q0", "MVR", strtolist=True)
+
+# nějaký způsob jak to vyplňovat v loopu
+for i in ["aaa", "aab", "abb", "abc", "bbb", "bbc", "bbd"]:
+  a.add_instruction("q0", i, "q0", "MVR", strtolist=True)
+
+# a spustíme automat a na text "#aaabbbc$" a vrátí True a vypíše cestu s barevně označeým oknem
+a.iterate_text("#aaabbbc$")
+# příklad z Example0.py
+\end{lstlisting}
+
+\end{document}

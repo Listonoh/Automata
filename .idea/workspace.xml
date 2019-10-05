@@ -2,14 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="ca13059d-d523-405d-b637-c47cc7822960" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/Automata/automata.py" beforeDir="false" afterPath="$PROJECT_DIR$/Automata/automata.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Automata/clear_to_full.py" beforeDir="false" afterPath="$PROJECT_DIR$/Automata/clear_to_full.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Automata/data.1.json" beforeDir="false" afterPath="$PROJECT_DIR$/Automata/data.1.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Automata/dsdf.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Automata/nejakebody.txt" beforeDir="false" afterPath="$PROJECT_DIR$/Automata/nejakebody.txt" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Automata/normal_testing.py" beforeDir="false" afterPath="$PROJECT_DIR$/Automata/normal_testing.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Automata/posible_instruction.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/Automata/testing_rewrite.py" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -22,6 +15,7 @@
   </component>
   <component name="ProjectId" id="1RMZBrYwePOEx544L40uCxUROEX" />
   <component name="PropertiesComponent">
+    <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="last_opened_file_path" value="$PROJECT_DIR$" />
   </component>
   <component name="RunDashboard">
@@ -49,6 +43,7 @@
       <option name="IS_MODULE_SDK" value="true" />
       <option name="ADD_CONTENT_ROOTS" value="true" />
       <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
       <option name="SCRIPT_NAME" value="$PROJECT_DIR$/Automata/Example0.py" />
       <option name="PARAMETERS" value="" />
       <option name="SHOW_COMMAND_LINE" value="false" />
@@ -74,15 +69,22 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1569478792311</updated>
+      <workItem from="1569529337823" duration="213000" />
+      <workItem from="1569959110650" duration="552000" />
     </task>
     <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="1" />
   </component>
   <component name="Vcs.Log.Tabs.Properties">
     <option name="TAB_STATES">
       <map>
         <entry key="MAIN">
           <value>
-            <State />
+            <State>
+              <option name="COLUMN_ORDER" />
+            </State>
           </value>
         </entry>
       </map>
