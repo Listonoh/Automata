@@ -8,8 +8,8 @@ from colorama import Fore, Back, Style, init
 init(autoreset=True)
 
 
-class status:
-    def __init__(self, state, position: int, text_version, father=None):
+class configuration:
+    def __init__(self, state: str, position: int, text_version: int, father=None):
         self.state, self.position, self.text_version = state, position, text_version
         self.father = father
 
@@ -86,17 +86,17 @@ class Automaton:
         end_of_pos = self.size_of_window + pos
 
         if instruction == "MVR":  # move right
-            s = status(new_state, pos + 1, stat.text_version, stat)
-            self.stats.append(s)
+            conf = configuration(new_state, pos + 1, stat.text_version, stat)
+            self.configs.append(conf)
         elif instruction == "MVL":  # move right
-            s = status(new_state, pos - 1, stat.text_version, stat)
-            self.stats.append(s)
+            conf = configuration(new_state, pos - 1, stat.text_version, stat)
+            self.configs.append(conf)
         elif instruction == "Restart":  # restart
-            s = status(new_state, 0, stat.text_version, stat)
-            self.stats.append(s)
+            conf = configuration(new_state, 0, stat.text_version, stat)
+            self.configs.append(conf)
         elif instruction == "Accept":  # restart
-            s = status(new_state, 0, stat.text_version, stat)
-            self.stats.append(s)
+            conf = configuration(new_state, 0, stat.text_version, stat)
+            self.configs.append(conf)
         # matching rewrites, for remove use "[]"
         elif re.match(r"^\[.*\]$", instruction):
             # new copy of current state
@@ -105,8 +105,8 @@ class Automaton:
             new_list[pos: end_of_pos] = new_values  # rewriting
 
             self.texts.append(new_list)
-            s = status(new_state, stat.position, len(self.texts) - 1, stat)
-            self.stats.append(s)
+            conf = configuration(new_state, stat.position, len(self.texts) - 1, stat)
+            self.configs.append(conf)
         return
 
     def add_instr(self, from_state: str, value, to_state: str, instruction: str, value_as_list: bool = False) -> bool:
@@ -131,17 +131,17 @@ class Automaton:
         self.definition["tr_function"][from_state][value] = [
             [to_state, instruction]]
 
-    def __move(self, window, stat):
-        possibilities = self.definition["tr_function"][stat.state]
+    def __move(self, window, conf):
+        possibilities = self.definition["tr_function"][conf.state]
         if "['*']" in possibilities:  # for all possibilities do this
             for possibility in possibilities["['*']"]:
                 print(
                     f">instruction: * -> new_state: ***") if self.out % 2 == 0 else None
-                self.__make_instruction(possibility[1], possibility[0], stat)
+                self.__make_instruction(possibility[1], possibility[0], conf)
         for possibility in possibilities[window]:
             print(
                 f">instruction: {window} -> new_state: {possibility[0]}, instruction: {possibility[1]}  ") if self.out % 2 == 0 else None
-            self.__make_instruction(possibility[1], possibility[0], stat)
+            self.__make_instruction(possibility[1], possibility[0], conf)
         print("----------------------------------",
               end="\n\n") if self.out % 2 == 0 else None
 
@@ -166,14 +166,14 @@ class Automaton:
             raise Exception("[] are not in pairs")
         return newtext
 
-    def pretty_printer(self, stat: status):
-        if stat is None:
+    def pretty_printer(self, conf: configuration):
+        if conf is None:
             return
         else:
-            self.pretty_printer(stat.father)
-            text = self.texts[stat.text_version]
+            self.pretty_printer(conf.father)
+            text = self.texts[conf.text_version]
             i = 0
-            b, e = stat.position, stat.position + self.size_of_window
+            b, e = conf.position, conf.position + self.size_of_window
             print("[", end="") if self.out % 3 == 0 else None
             while i < len(text):
                 if b <= i < e:
@@ -192,32 +192,32 @@ class Automaton:
         # implicitly set to 1
         self.size_of_window = self.definition["size_of_window"]
         # implicitly set to "st0" and 0
-        starting_status = status(
+        starting_status = configuration(
             self.definition["s0"][0], self.definition["s0"][1], 0)
-        self.stats = [starting_status]
+        self.configs = [starting_status]
         print(self.texts[0]) if self.out % 2 == 0 else None
         while True:
             try:
-                s = self.stats.pop()
-                if s.state == "Accept":
+                conf = self.configs.pop()
+                if conf.state == "Accept":
                     raise Exception("Accepting state")
                 print(
-                    f"     > taking status : {s}") if self.out % 2 == 0 else None
+                    f"     > taking status : {conf}") if self.out % 2 == 0 else None
                 window = self.__get_window(
-                    self.texts[s.text_version], s.position)
+                    self.texts[conf.text_version], conf.position)
                 print(
-                    f" text: {self.texts[s.text_version]}") if self.out % 2 == 0 else None
+                    f" text: {self.texts[conf.text_version]}") if self.out % 2 == 0 else None
                 print(f" window: {window}") if self.out % 2 == 0 else None
-                self.__move(window, s)
+                self.__move(window, conf)
             except:
-                if self.is_accepting_state(s.state):
+                if self.is_accepting_state(conf.state):
                     print(
                         f"remaining tuples = {self.stats}") if self.out % 2 == 0 else None
                     print(
                         f"number of copies of text = {len(self.texts)}") if self.out % 2 == 0 else None
-                    self.pretty_printer(s)
+                    self.pretty_printer(conf)
                     return True
-                elif self.stats.__len__() == 0:
+                elif self.configs.__len__() == 0:
                     return False
 
     def print_tr_function(self):
