@@ -12,26 +12,25 @@ a.add_to_alphabet("#", "$", "a", "b", "c", "d")
 a.add_accepting_state("Accept")
 
 for i in ["aaa", "aab", "abb", "abc", "bbb", "bbc", "bbd"]:
-    a.add_instr("q0", i, "q0", "MVR", strtolist=True)
+    a.add_instr("q0", i, "q0", "MVR")
 
-a.add_instr("q0", "#c$", "Accept", "Accept", strtolist=True)
-a.add_instr("q0", "#d$", "Accept", "Accept", strtolist=True)
+a.add_instr("q0", "#c$", "Accept", "Accept")
+a.add_instr("q0", "#d$", "Accept", "Accept")
 
-a.add_instr("q0", "#ab", "q0", "MVR", strtolist=True)
-a.add_instr("q0", "#aa", "q0", "MVR", strtolist=True)
-a.add_instr("q0", "bc$", "qc", "MVL", strtolist=True)
-a.add_instr("q0", "bd$", "qd", "MVL", strtolist=True)
+a.add_instr("q0", "#ab", "q0", "MVR")
+a.add_instr("q0", "#aa", "q0", "MVR")
+a.add_instr("q0", "bc$", "qc", "MVL")
+a.add_instr("q0", "bd$", "qd", "MVL")
 
-a.add_instr("qr", "*", "q0", "Restart", strtolist=True)
+a.add_instr("qr", "*", "q0", "Restart")
 
-a.add_instr("qc", "abc", "qr", "['c']", strtolist=True)
-a.add_instr("qc", "bbc", "q
-c", "MVL", strtolist=True)
-a.add_instr("qc", "bbb", "qc", "MVL", strtolist=True)
-a.add_instr("qc", "abb", "qr", "['b']", strtolist=True)
-a.add_instr("qd", "bbd", "qd", "MVL", strtolist=True)
-a.add_instr("qd", "bbb", "qd", "MVL", strtolist=True)
-a.add_instr("qd", "abb", "qr", "[]", strtolist=True)
+a.add_instr("qc", "abc", "qr", "['c']")
+a.add_instr("qc", "bbc", "qc", "MVL")
+a.add_instr("qc", "bbb", "qc", "MVL")
+a.add_instr("qc", "abb", "qr", "['b']")
+a.add_instr("qd", "bbd", "qd", "MVL")
+a.add_instr("qd", "bbb", "qd", "MVL")
+a.add_instr("qd", "abb", "qr", "[]")
 
 print(a.iterate_text("#aaabbbc$"))  # true
 sys.stdin.readline()

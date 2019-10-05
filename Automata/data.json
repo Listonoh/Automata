@@ -2,11 +2,11 @@
 	"alphabet" : ["a", "b", "[a,b]"],
 	"sAcc" : ["st0"],
 	"size_of_window": 1,
-	"name": "", 
+	"name": "",
 	"type": "",
 	"doc_string" : "to co je v pythonu",
-	"instructions" : 	
-	{ 	
+	"instructions" :
+	{
 		"st0": { "['a']" : [["st0","['b']"]], "['b']": [["st1","[]"], ["[st0, st1]","MVR"]], "['[a,b]']":  [["st1","MVR"]]},
 		"st1": { "['a']" : [["st1","MVR"]], "['b']": [["st0","MVR"]]},
 		"[st0, st1]": { "['b']" : [["st0", "MVR"]]}
