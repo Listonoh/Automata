@@ -1,3 +1,4 @@
 .idea/*
 *.fdb_larexmk
 *.log
+*.synctex.gz

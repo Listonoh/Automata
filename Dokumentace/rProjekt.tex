@@ -161,14 +161,12 @@ a.add_accepting_state("Accept")
 # přidání pravidla (q0, #ab) -> (q0, MVR)
 # /neboli ze stavu q0 a po přečtení "#ab" přejde
 # automat do stavu q0 a posune se o jednu pozici doprava
-# strtolist=True udává zda se přečtené data mají převést
-# do listu tedy každý znak odpovídá jednomu
 # symbolu abecedy -> ["#","a","b"]
-a.add_instruction("q0", "#ab", "q0", "MVR", strtolist=True)
+a.add_instruction("q0", "#ab", "q0", "MVR")
 
 # nějaký způsob jak to vyplňovat v loopu
 for i in ["aaa", "aab", "abb", "abc", "bbb", "bbc", "bbd"]:
-  a.add_instruction("q0", i, "q0", "MVR", strtolist=True)
+  a.add_instruction("q0", i, "q0", "MVR")
 
 # a spustíme automat a na text "#aaabbbc$" a vrátí True a vypíše cestu s barevně označeým oknem
 a.iterate_text("#aaabbbc$")
