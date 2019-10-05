@@ -72,11 +72,11 @@ class Automaton:
                 return return_arr
         return return_arr
 
-    def get_words_of_lenght(self, lenght=5, count=20):
+    def get_words_of_length(self, length=5, count=20):
         retarr = []
-        for posibility in itertools.product(self.mess["alphabet"], lenght):
+        for possibility in itertools.product(self.mess["alphabet"], length):
             if True:
-                retarr.append(posibility)
+                retarr.append(possibility)
             if len(retarr) >= count:
                 return retarr
         return retarr
@@ -107,7 +107,7 @@ class Automaton:
             self.stats.append(s)
         return
 
-    def add_instruction(self, from_state: str, value, to_state: str, instruction: str, strtolist: bool = False) -> bool:
+    def add_instr(self, from_state: str, value, to_state: str, instruction: str, strtolist: bool = False) -> bool:
         """
         Does not rewrite if exist, see replace_instruction
         modify delta[from_state, value] -> [state, instruction]
