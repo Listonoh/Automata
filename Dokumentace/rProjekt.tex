@@ -13,7 +13,7 @@
 	backgroundcolor=\color{light-gray},
 }
 
-\title{ Ročníkový projekt: Knihovna pro testování lehkých restartujících automatů a webové prostředí}
+\title{ Ročníkový projekt: Knihovna pro testování restartujících automatů a webové prostředí}
 \author{Jan Urban }
 \date{October 2019}
 
@@ -29,11 +29,17 @@
 
 \section*{Úvod}
 
-Tato práce pojednává o tvorbě knihovny pro práci s restartujícími automaty a její vizualizaci na webu.
-V první kapitole zadefinuji třídy restartujících automatů a vlastnosti které podporuje tato knihovna.
+Tato práce pojednává o tvorbě knihovny pro práci s restartujícími automaty.
+A vizualizaci restartujících automatů ve webovém prostředí.
+V první kapitole zadefinuji třídy restartujících automatů a vlastnosti, které podporuje tato knihovna.
 Druhá kapitola se zaměřuje na webové rozhraní.
 Ve třetí je podrobněji rozepsáno jak s knihovnou pracovat.
 A ve čtvrté je jak knihovna funguje.
+
+\subsection{Redukční analýza}
+Redukční analýza je metoda, která pomocí odstraňování a přesouvání slov ve větě,
+redukuje větu na kratší větu a zachová správnost věty.
+
 
 \subsection{Příklad použití restartujících automatů}
 Příklad od lingvistů, kde restartující automat mohou použít na redukční analýzu věty:
@@ -58,26 +64,27 @@ Stejně nekorektní, tedy neúplná, je následující větev úprav:
 Z čehož je už možné zjistit že věta je špatně, nebo po další redukci na "Trosky zavalily"
 
 \section{Jaké typy automatů program rozpozná}
-Zde jsou zadefinované třídy restartujících automatů a vypsané vlastnosti které má knihovna rozpozná.
+Zde jsou zadefinované třídy restartujících automatů a vypsané vlastnosti, které má knihovna rozpoznávat.
 
-\subsection{RRWW}
-Restartující automat je n-tice $M =  (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, Q_A, Q_R)$.
+\subsection{RLWW}
+Restartující automat je 10-tice $M =  (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, Q_A)$.
 \begin{itemize}
-	\item  $Q$ je konečná množina stavů
+	\item  $Q$ je konečná množina stavů.
 	\item  $\Sigma  \ a \ \Gamma$ jsou konečné množiny symbolů,
-		vstupní abeceda a pracovní abeceda v tomto pořadí, pro které platí že sigma subset of gamma.
-	\item  $k$ je nezáporné číslo udávající velikost dopředného okna,
-		kolik znaků před hlavu automatu vidíme. (neboli velikost celého okna je k+1)
-	\item  $I$ je konečná množina pravidel následujících tří typů:
+		vstupní abeceda a pracovní abeceda v tomto pořadí, pro které platí že $\Sigma  \subseteq \ \Gamma$.
+	\item  $k$ je nezáporné číslo udávající velikost okna.
+	\item  $I$ je konečná množina pravidel následujících čtyř typů, pro které platí $u, v \in \Sigma^\ast$ a $q, q' \in Q$:
 		\begin{enumerate}
-			\item $(q, au) \to (q',$ MVR$)$ nebo $(q, au) \to (q', $MVL$)$
-			\item $(q, au)\to(q', v)$	- neboli Rewrite(v)
-			\item $(q, au) \to (q_0, Restart)$
+			\item $(q, u) \to (q',$ MVR$)$ nebo $(q, au) \to (q', $MVL$)$
+			\item $(q, u)\to(q', v)$	- neboli Rewrite(v)
+			\item $(q, u) \to (q_0, Restart)$
 		\end{enumerate}
-	\item  $q_0$ je počáteční stav a platí $q_0 \in Q$
-	\item  $Q_A$ jsou akceptující stavy $Q_A \subseteq Q$
-	\item  $Q_R$ jsou odmítající stavy $Q_R \subseteq Q$
-	\item  První symbol je normálně \cent (v mém případě volím \# - dá se lépe najít na klávesnici) a posledním symbolem je \$ u dané pásky
+	\item  $q_0$ je počáteční stav a platí $q_0 \in Q$.
+	\item  $Q_A$ jsou akceptující stavy $Q_A \subseteq Q$.
+	\item  Jako první symbol pásky(levá zarážka) se v literatuře používá znak \cent.
+	Cent se běžně na dnešní klávesnici nevyskytuje, tak v knihovně volím pro levou zarážku znak \#.
+	Který se dá lépe najít na klávesnici.
+	A poslední znak pásky(pravá zarážka) je \$.
 \end{itemize}
 
 $Q$ je rozdělena do dvou množin a to do:
@@ -86,12 +93,14 @@ $Q$ je rozdělena do dvou množin a to do:
 
 \subsubsection{Něco více o pravidlech}
 \begin{enumerate}
-	\item MVR/MVL - automat M změní stav na $q'$ a posune hlavu doprava na další symbol (symbol myslíme jako nějakou n-tici znaků, n >= 1)
-	\item $(q, au)\to(q', v)$ - přepíše $au$ na $v$, kde by $v$ mělo být kratší než $au$.
-	To se docílí smazáním alespoň jednoho symbolu ) a nahrazením dalších symbolů z $au$.
-	\item  $Restartuj$ změní stav na počáteční a přesune hlavu na začátek pásky, tak že první znak v okně bude levá zarážka (\#).
+	\item MVR/MVL -- automat M změní stav na $q'$ a posune okno doprava na políčko pásky.
+	\item $(q, u)\to(q', v)$ -- přepíše $u$ na $v$, kde $v$ musí být kratší než $u$.
+	To se docílí smazáním alespoň jednoho symbolu a nahrazením dalších symbolů z $u$.
+	\item  $Restart$ změní stav na počáteční a přesune hlavu na začátek pásky, tak že první znak v okně bude levá zarážka (\#).
 \end{enumerate}
 
+\subsection{RRWW}
+Vychází z RLWW-automatu ale nepoužívá MVL -- posun doleva
 \subsection{RRW}
 Vychází z RRWW-automatu ale má totožnou pracovní abecedu s vstupní abecedou
 \subsection{RR}
