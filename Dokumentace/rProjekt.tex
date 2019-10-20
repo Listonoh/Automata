@@ -101,17 +101,18 @@ $Q$ je rozdělena do dvou množin a to do:
 
 \subsection{RRWW}
 Vychází z RLWW-automatu ale nepoužívá MVL -- posun doleva
-\subsection{RRW}
-Vychází z RRWW-automatu ale má totožnou pracovní abecedu s vstupní abecedou
-\subsection{RR}
-Vychází z RRW-automatu, ale zakazuje přepisovat, tedy může jen mazat
+\subsection{RRW (RLW)}
+Vychází z RRWW (RLWW)-automatu ale má totožnou pracovní abecedu s vstupní abecedou
+\subsection{RR (RL)}
+Vychází z RRW (RLW)-automatu, ale zakazuje přepisovat, tedy může jen mazat
 \subsection{R}
 Vychází z RR automatu, ale restartuje se ihned po přepsání (smazání)
 \subsection{RWW}
 Vychází z RRWW automatu, ale po přepsání se ihned restartuje
 
 \subsection{Determinismus}
-Projde všechny pravidla a pokud má každé maximálně jednu pravou stranu, tak je automat deterministický.
+Pokud má automat pro každou dvojici $(q, u)$, kde $q \in Q$, $u \in \Sigma^\ast$,
+nejvýše jedno pravidlo s levou stranou $(q, u)$, tak říkáme, že automat je deterministický.
 
 \subsection{možno doplnit}
 monotonii
