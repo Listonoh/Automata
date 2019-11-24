@@ -8,13 +8,15 @@
 \usepackage{color}
 \definecolor{light-gray}{gray}{0.85}
 
+\newtheorem{theorem}{Definice}
+
 \lstset{
 	tabsize=2,
 	backgroundcolor=\color{light-gray},
 }
 
 \title{ Ročníkový projekt: Knihovna pro testování restartujících automatů a webové prostředí}
-\author{Jan Urban }
+\author{Jan Urban}
 \date{October 2019}
 
 \begin{document}
@@ -66,8 +68,10 @@ Z čehož je už možné zjistit že věta je špatně, nebo po další redukci 
 \section{Jaké typy automatů program rozpozná}
 Zde jsou zadefinované třídy restartujících automatů a vypsané vlastnosti, které má knihovna rozpoznávat.
 
-\subsection{RLWW}
-Restartující automat je 10-tice $M =  (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, Q_A)$.
+\begin{theorem}[RLWW]
+
+Nechť M je RLWW automat pak platí $M = (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, Q_A)$.
+
 \begin{itemize}
 	\item  $Q$ je konečná množina stavů.
 	\item  $\Sigma  \ a \ \Gamma$ jsou konečné množiny symbolů,
@@ -75,13 +79,15 @@ Restartující automat je 10-tice $M =  (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, 
 	\item  $k$ je nezáporné číslo udávající velikost okna.
 	\item  $I$ je konečná množina pravidel následujících čtyř typů, pro které platí $u, v \in \Sigma^\ast$ a $q, q' \in Q$:
 		\begin{enumerate}
-			\item $(q, u) \to (q',$ MVR$)$ nebo $(q, au) \to (q', $MVL$)$
+			\item $(q, u) \to (q',$ MVR$)$ (posun doprava)
+			\item $(q, au) \to (q', $MVL$)$ (posun doleva)
 			\item $(q, u)\to(q', v)$	- neboli Rewrite(v)
 			\item $(q, u) \to (q_0, Restart)$
 		\end{enumerate}
 	\item  $q_0$ je počáteční stav a platí $q_0 \in Q$.
 	\item  $Q_A$ jsou akceptující stavy $Q_A \subseteq Q$.
-	\item  Jako první symbol pásky(levá zarážka) se v literatuře používá znak \cent.
+	\item  Jako první symbol pásky (levá zarážka)	se v literatuře používá znak
+	 \cent.
 	Cent se běžně na dnešní klávesnici nevyskytuje, tak v knihovně volím pro levou zarážku znak \#.
 	Který se dá lépe najít na klávesnici.
 	A poslední znak pásky(pravá zarážka) je \$.
@@ -90,7 +96,7 @@ Restartující automat je 10-tice $M =  (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, 
 $Q$ je rozdělena do dvou množin a to do:
 1. nekoncové stavy $Q - (Q_A \cup Q_R)$ které mají alespoň jedno pravidlo pro každý vstup do kterého se mohou dostat
 2. koncové stavy $Q_A \cup Q_R$ které ukončují celou práci automatu
-
+\end{theorem}
 \subsubsection{Něco více o pravidlech}
 \begin{enumerate}
 	\item MVR/MVL -- automat M změní stav na $q'$ a posune okno doprava na políčko pásky.
