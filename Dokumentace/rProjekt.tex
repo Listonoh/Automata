@@ -65,23 +65,21 @@ Stejně nekorektní, tedy neúplná, je následující větev úprav:
 
 Z čehož je už možné zjistit že věta je špatně, nebo po další redukci na "Trosky zavalily"
 
-\section{Jaké typy automatů program rozpozná}
+\section{Typy automatů které program rozpozná}
 Zde jsou zadefinované třídy restartujících automatů a vypsané vlastnosti, které má knihovna rozpoznávat.
 
 \begin{theorem}[RLWW]
-
 Nechť M je RLWW automat pak platí $M = (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, Q_A)$.
-
 \begin{itemize}
 	\item  $Q$ je konečná množina stavů.
 	\item  $\Sigma  \ a \ \Gamma$ jsou konečné množiny symbolů,
 		vstupní abeceda a pracovní abeceda v tomto pořadí, pro které platí že $\Sigma  \subseteq \ \Gamma$.
 	\item  $k$ je nezáporné číslo udávající velikost okna.
-	\item  $I$ je konečná množina pravidel následujících čtyř typů, pro které platí $u, v \in \Sigma^\ast$ a $q, q' \in Q$:
+	\item  $I$ je konečná množina pravidel následujících čtyř typů, pro které platí $u, v \in (\Sigma \cup \Gamma)^*$ a $q, q' \in Q$:
 		\begin{enumerate}
 			\item $(q, u) \to (q',$ MVR$)$ (posun doprava)
-			\item $(q, au) \to (q', $MVL$)$ (posun doleva)
-			\item $(q, u)\to(q', v)$	- neboli Rewrite(v)
+			\item $(q, u) \to (q', $MVL$)$ (posun doleva)
+			\item $(q, u) \to (q', v)$	- neboli Rewrite(v)
 			\item $(q, u) \to (q_0, Restart)$
 		\end{enumerate}
 	\item  $q_0$ je počáteční stav a platí $q_0 \in Q$.
@@ -99,7 +97,7 @@ $Q$ je rozdělena do dvou množin a to do:
 \end{theorem}
 \subsubsection{Něco více o pravidlech}
 \begin{enumerate}
-	\item MVR/MVL -- automat M změní stav na $q'$ a posune okno doprava na políčko pásky.
+	\item 
 	\item $(q, u)\to(q', v)$ -- přepíše $u$ na $v$, kde $v$ musí být kratší než $u$.
 	To se docílí smazáním alespoň jednoho symbolu a nahrazením dalších symbolů z $u$.
 	\item  $Restart$ změní stav na počáteční a přesune hlavu na začátek pásky, tak že první znak v okně bude levá zarážka (\#).
@@ -107,21 +105,59 @@ $Q$ je rozdělena do dvou množin a to do:
 
 \subsection{RRWW}
 Vychází z RLWW-automatu ale nepoužívá MVL -- posun doleva
+
 \subsection{RRW (RLW)}
 Vychází z RRWW (RLWW)-automatu ale má totožnou pracovní abecedu s vstupní abecedou
+
 \subsection{RR (RL)}
 Vychází z RRW (RLW)-automatu, ale zakazuje přepisovat, tedy může jen mazat
+
 \subsection{R}
 Vychází z RR automatu, ale restartuje se ihned po přepsání (smazání)
+
 \subsection{RWW}
 Vychází z RRWW automatu, ale po přepsání se ihned restartuje
 
-\subsection{Determinismus}
-Pokud má automat pro každou dvojici $(q, u)$, kde $q \in Q$, $u \in \Sigma^\ast$,
-nejvýše jedno pravidlo s levou stranou $(q, u)$, tak říkáme, že automat je deterministický.
 
-\subsection{možno doplnit}
-monotonii
+
+\begin{theorem}[Konfigurace]
+	Konfigurací automatu A máme na mysli dvojici skládající se z současného stavu automatu A a ze vstupu z pásky automatu A.
+	Tato konfigurace je zapsána dvojící $(q \in Q, s \subseteq (\Sigma \cup \Gamma)^* )$.
+	Kde $q$ je stavem automatu A a $s$ je vstup z pásky.
+\end{theorem}
+
+\begin{theorem}[Krok]
+	Krokem automatu A rozumíme provedení jednoho pravidla.
+	Pravidla mají zápis $(q_0, u) \to (q_1, pravidlo)$.
+	Kde $q_0, q_1 \in Q$, $u \subseteq (\Sigma \cup \Gamma)^*$ a pravidlo náleží jednomu ze 3. možností:
+	\begin{itemize}
+		\item MVL -- posun hlavy automatu doleva
+		\item MVR -- posun hlavy automatu doprava
+		\item $v \subseteq (\Sigma \cup \Gamma)^*$  -- přepsání znaků pod hlavou automatu na v (vždy menší nebo stejné délky jako u)
+		\item Restart -- Automat přejde do počátečního stavu $q_0$
+	\end{itemize}
+\end{theorem}
+
+\begin{theorem}[Transitivita]
+	
+\end{theorem}
+
+\begin{theorem}[Přijímutí slova]
+	Slovo je příjímuto pokud existuje posloupnost pravidel, které se na daném slovu dostanou z počátečního stavu do přijímajícího.
+
+
+\end{theorem}
+
+
+\begin{theorem}[Determinismus]
+Pokud má automat pro každou dvojici $(q, u)$, kde $q \in Q$, $u \subseteq (\Sigma \cup \Gamma)^*$ a platí alespoň jedno z následujících tří pravidel:
+$|u| = k$, $|u| < k$ a končí na \$, nebo $|u| < k$ začíná na \# a končí na \$.
+nejvýše jedno pravidlo s levou stranou $(q, u)$, tak říkáme, že automat je deterministický.
+\end{theorem}
+
+\subsection{monotonie}
+
+
 
 \section{Webové prostředí}
 \begin{itemize}
@@ -200,6 +236,11 @@ Ale pokud se uvnitř použijí hranaté závorky musí být vždy v páru.
 a.iterate_text("#aa[Znak]bbc$")
 a.iterate_text("#aa[[a]cb]bbc$")
 \end{lstlisting}
+
+
+\end{document}
+-------------------------------------------
+
 
 \section{Jak funguje knihovna}
 V této sekci bych probral z jakých částí je složena tato knihovnička.
