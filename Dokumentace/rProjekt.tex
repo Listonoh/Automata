@@ -8,14 +8,14 @@
 \usepackage{color}
 \definecolor{light-gray}{gray}{0.85}
 
-\newtheorem{theorem}{Definice}
+\newtheorem{definition}{Definice}
 
 \lstset{
 	tabsize=2,
 	backgroundcolor=\color{light-gray},
 }
 
-\title{ Ročníkový projekt: Knihovna pro testování restartujících automatů a webové prostředí}
+\title{ Ročníkový projekt: Knihovnda pro testování restartujících automatů a webové prostředí}
 \author{Jan Urban}
 \date{October 2019}
 
@@ -66,42 +66,73 @@ Stejně nekorektní, tedy neúplná, je následující větev úprav:
 Z čehož je už možné zjistit že věta je špatně, nebo po další redukci na "Trosky zavalily"
 
 \section{Typy automatů které program rozpozná}
-Zde jsou zadefinované třídy restartujících automatů a vypsané vlastnosti, které má knihovna rozpoznávat.
+Zde jsou zadefinované třídy restartujících automatů a vypsané vlastnosti, které knihovna rozpoznává.
 
-\begin{theorem}[RLWW]
-Nechť M je RLWW automat pak platí $M = (Q ,\Sigma, \Gamma, \# , \$, k ,I ,q_0, Q_A)$.
+\begin{definition}[RLWW]
+Nechť M je RLWW automat pak platí $M = (Q ,\Sigma, \Gamma, \# , \$, q_0, k, \delta)$.
 \begin{itemize}
 	\item  $Q$ je konečná množina stavů.
-	\item  $\Sigma  \ a \ \Gamma$ jsou konečné množiny symbolů,
-		vstupní abeceda a pracovní abeceda v tomto pořadí, pro které platí že $\Sigma  \subseteq \ \Gamma$.
-	\item  $k$ je nezáporné číslo udávající velikost okna.
-	\item  $I$ je konečná množina pravidel následujících čtyř typů, pro které platí $u, v \in (\Sigma \cup \Gamma)^*$ a $q, q' \in Q$:
-		\begin{enumerate}
-			\item $(q, u) \to (q',$ MVR$)$ (posun doprava)
-			\item $(q, u) \to (q', $MVL$)$ (posun doleva)
-			\item $(q, u) \to (q', v)$	- neboli Rewrite(v)
-			\item $(q, u) \to (q_0, Restart)$
-		\end{enumerate}
-	\item  $q_0$ je počáteční stav a platí $q_0 \in Q$.
-	\item  $Q_A$ jsou akceptující stavy $Q_A \subseteq Q$.
-	\item  Jako první symbol pásky (levá zarážka)	se v literatuře používá znak
-	 \cent.
-	Cent se běžně na dnešní klávesnici nevyskytuje, tak v knihovně volím pro levou zarážku znak \#.
-	Který se dá lépe najít na klávesnici.
-	A poslední znak pásky(pravá zarážka) je \$.
+	\item  $\Sigma$  je konečná vstupní abeceda.
+	\item  $\Gamma$ je konečná pracovní abeceda která obsahuje $\Sigma$, ,  ,
+	\item  $\#, \$ \notin Q$ jsou symboly které označují levou zarážku a pravou zarážku, neboli začátek a konec vstupního slova.
+	\item  $q_0 \in Q$ je počáteční stav.
+	\item  $k \in N_+$ je nezáporné celé číslo udávající velikost čtecího/zapisovacího okna.
+	\item  $\delta : Q \times PC^{(k)} \to 2^{((Q\times(\{MVR,MVL\}\cup PC^{\leq (k-1)}))\cup \{Restart, Accept\})}$
+		je tranzitivní relací. Kde $PC^{(k)}$ je množina možných obsahů čtecího/zapisovacího okna $M$.
 \end{itemize}
 
-$Q$ je rozdělena do dvou množin a to do:
-1. nekoncové stavy $Q - (Q_A \cup Q_R)$ které mají alespoň jedno pravidlo pro každý vstup do kterého se mohou dostat
-2. koncové stavy $Q_A \cup Q_R$ které ukončují celou práci automatu
-\end{theorem}
+$PC^{(k)} := (\# \cdot \Gamma ^{i-1}) \cup 
+		\Gamma \cup 
+		(\Gamma ^{\leq i-1} \cdot \$) \cup 
+		(\# \cdot \Gamma ^{\leq i-2} \cdot \$) (i \geq 0)$
+
+$\Gamma^{\leq ^n} := \bigcup\limits_{i=0}^{n} \Gamma^{i} $ 
+
+$PC^{\leq(k-1)} := \bigcup\limits_{i=0}^{k-1} PC^{i}$
+
+\end{definition}
 \subsubsection{Něco více o pravidlech}
 \begin{enumerate}
-	\item 
+	\item
 	\item $(q, u)\to(q', v)$ -- přepíše $u$ na $v$, kde $v$ musí být kratší než $u$.
 	To se docílí smazáním alespoň jednoho symbolu a nahrazením dalších symbolů z $u$.
 	\item  $Restart$ změní stav na počáteční a přesune hlavu na začátek pásky, tak že první znak v okně bude levá zarážka (\#).
 \end{enumerate}
+
+
+\begin{definition}[Konfigurace]
+	Konfigurací automatu A máme na mysli dvojici skládající se z současného stavu automatu A a ze vstupu z okna automatu A.
+	Tato konfigurace je zapsána dvojicí $(q \in Q, s \subseteq (\Sigma \cup \Gamma)^* )$.
+	Kde $q$ je stavem automatu A a $s$ je vstup z pásky.
+\end{definition}
+
+\begin{definition}[Krok]
+	Krokem automatu A rozumíme provedení jednoho pravidla.
+	Pravidla mají zápis $(q_0, u) \to (q_1, pravidlo)$.
+	Kde $q_0, q_1 \in Q$, $u \subseteq (\Sigma \cup \Gamma)^*$ a pravidlo náleží jednomu ze 3. možností:
+	\begin{itemize}
+		\item MVL -- posun hlavy automatu doleva
+		\item MVR -- posun hlavy automatu doprava
+		\item $v \subseteq (\Sigma \cup \Gamma)^*$
+		-- přepsání znaků pod hlavou automatu na v (vždy menší nebo stejné délky jako u)
+		\item Restart -- Automat přejde do počátečního stavu $q_0$
+	\end{itemize}
+\end{definition}
+
+\begin{definition}[Přijmutí slova]
+	Slovo je přijato pokud existuje posloupnost pravidel, které se na daném slovu dostanou z počátečního stavu do přijímajícího.
+
+
+\end{definition}
+
+
+\begin{definition}[Determinismus]
+Pokud má automat pro každou dvojici $(q, u)$, kde $q \in Q$, $u \subseteq (\Sigma \cup \Gamma)^*$ a platí alespoň jedno z následujících tří pravidel:
+$|u| = k$, $|u| < k$ a končí na \$, nebo $|u| < k$ začíná na \# a končí na \$.
+nejvýše jedno pravidlo s levou stranou $(q, u)$, tak říkáme, že automat je deterministický.
+\end{definition}
+
+\subsection{monotonie}
 
 \subsection{RRWW}
 Vychází z RLWW-automatu ale nepoužívá MVL -- posun doleva
@@ -117,47 +148,6 @@ Vychází z RR automatu, ale restartuje se ihned po přepsání (smazání)
 
 \subsection{RWW}
 Vychází z RRWW automatu, ale po přepsání se ihned restartuje
-
-
-
-\begin{theorem}[Konfigurace]
-	Konfigurací automatu A máme na mysli dvojici skládající se z současného stavu automatu A a ze vstupu z pásky automatu A.
-	Tato konfigurace je zapsána dvojící $(q \in Q, s \subseteq (\Sigma \cup \Gamma)^* )$.
-	Kde $q$ je stavem automatu A a $s$ je vstup z pásky.
-\end{theorem}
-
-\begin{theorem}[Krok]
-	Krokem automatu A rozumíme provedení jednoho pravidla.
-	Pravidla mají zápis $(q_0, u) \to (q_1, pravidlo)$.
-	Kde $q_0, q_1 \in Q$, $u \subseteq (\Sigma \cup \Gamma)^*$ a pravidlo náleží jednomu ze 3. možností:
-	\begin{itemize}
-		\item MVL -- posun hlavy automatu doleva
-		\item MVR -- posun hlavy automatu doprava
-		\item $v \subseteq (\Sigma \cup \Gamma)^*$  -- přepsání znaků pod hlavou automatu na v (vždy menší nebo stejné délky jako u)
-		\item Restart -- Automat přejde do počátečního stavu $q_0$
-	\end{itemize}
-\end{theorem}
-
-\begin{theorem}[Transitivita]
-	
-\end{theorem}
-
-\begin{theorem}[Přijímutí slova]
-	Slovo je příjímuto pokud existuje posloupnost pravidel, které se na daném slovu dostanou z počátečního stavu do přijímajícího.
-
-
-\end{theorem}
-
-
-\begin{theorem}[Determinismus]
-Pokud má automat pro každou dvojici $(q, u)$, kde $q \in Q$, $u \subseteq (\Sigma \cup \Gamma)^*$ a platí alespoň jedno z následujících tří pravidel:
-$|u| = k$, $|u| < k$ a končí na \$, nebo $|u| < k$ začíná na \# a končí na \$.
-nejvýše jedno pravidlo s levou stranou $(q, u)$, tak říkáme, že automat je deterministický.
-\end{theorem}
-
-\subsection{monotonie}
-
-
 
 \section{Webové prostředí}
 \begin{itemize}
@@ -221,7 +211,7 @@ a.add_instr("q0", "[ '#', '*', '?a*']",
 	"q0", "MVR", value_as_list=True)
 \end{lstlisting}
 
-\subsection{Otestování pásky, zda bude přijata automatem}
+\subsection{Otestování slova, zda bude přijata automatem}
 Otestování na výstup buď zamítne (napsáním False), nebo přijme (True) a když dané slovo přijme,
 tak vypíše na konzoli jak automat postupoval.
 Páska by měla být ohraničená zarážkami \# a \$.
