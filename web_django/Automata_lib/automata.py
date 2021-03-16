@@ -184,7 +184,6 @@ class Automaton:
         return str(text[position:end_of_pos])
 
     def __parse_text_to_list(self, text):
-        "".
         parsed_text = []
         ctr = 0
         working_string = ""
