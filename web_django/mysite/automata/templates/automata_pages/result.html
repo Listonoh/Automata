@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<ul>
+	<li><b>{{ automaton_result }}</b></li>
+</ul>
+
+logs:
+<ul>
+{% for line in logs %}
+	<li>
+		{{ line | safe }}
+	</li>
+
+{% endfor %}
+</ul>
+
+{% endblock content %}

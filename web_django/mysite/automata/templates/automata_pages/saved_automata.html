@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% block content %}
+
+
+{% if list_of_automats %}
+    <ul>
+    {% for automat in list_of_automats %}
+        <li><a href="/playground/{{ automat.id }}/">{{ automat.id }}</a></li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No automatons are available.</p>
+{% endif %}
+
+{% endblock content %}
