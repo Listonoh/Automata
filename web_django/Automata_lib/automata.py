@@ -1,13 +1,11 @@
 import itertools
 import json
 import re
-import os
-import sys
-from typing import Type
-from colorama import Fore, Back, Style, init
+# from colorama import Fore, Back, Style, init
 from dataclasses import dataclass
+from typing import Type
 
-init(autoreset=True)
+# init(autoreset=True)
 
 
 @dataclass
@@ -18,7 +16,8 @@ class configuration:
     father: Type["configuration"] = None
 
     def __str__(self):
-        return f"state: {self.state}, position: {self.position}, text_version: {self.text_version} "
+        return f"state: {self.state}, position: {self.position},\
+         text_version: {self.text_version} "
 
 
 class Automaton:
@@ -48,7 +47,8 @@ class Automaton:
                     2, "Automaton loaded\n----------------------------------")
             except (FileNotFoundError, FileExistsError):
                 self.log(
-                    2, "\nAutomaton can not be loaded\n----------------------------------")
+                    2, "\nAutomaton can not be loaded\
+                        \n----------------------------------")
                 return
 
     def log(self, importance, message, end="\n"):
@@ -84,7 +84,8 @@ class Automaton:
 
     def clear(self):
         self.log(
-            2, "Loading clear automaton, \n Init State is 'st0' and window size is set to 1 \n Accepting state is 'st0'")
+            2, "Loading clear automaton, \n Init State is 'st0' and window\
+                 size is set to 1 \n Accepting state is 'st0'")
         self.starting_state = "st0"
         self.starting_position = 0
         self.alphabet = set()
@@ -114,7 +115,8 @@ class Automaton:
                 return return_arr
         return return_arr
 
-    def __make_instruction(self, instruction: str, new_state: str, stat: configuration):
+    def __make_instruction(self, instruction: str,
+                           new_state: str, stat: configuration):
         position = stat.position
         end_position = self.size_of_window + position
 
@@ -145,7 +147,8 @@ class Automaton:
             self.configs.append(conf)
         return
 
-    def add_instr(self, from_state: str, value, to_state: str, instruction: str, value_as_list: bool = False) -> bool:
+    def add_instr(self, from_state: str, value, to_state: str,
+                  instruction: str, value_as_list: bool = False) -> bool:
         """
         Does not rewrite if exist, see replace_instruction
         modify delta[from_state, value] -> [state, instruction]
@@ -171,11 +174,12 @@ class Automaton:
         possibilities = self.instructions[conf.state]
         if "['*']" in possibilities:  # for all possibilities do this
             for possibility in possibilities["['*']"]:
-                self.log(2, f">instruction: * -> new_state: ***")
+                self.log(2, ">instruction: * -> new_state: ***")
                 self.__make_instruction(possibility[1], possibility[0], conf)
         for possibility in possibilities[window]:
             self.log(
-                2, f">instruction: {window} -> new_state: {possibility[0]}, instruction: {possibility[1]}  ")
+                2, f">instruction: {window} -> new_state: {possibility[0]},\
+                     instruction: {possibility[1]}  ")
             self.__make_instruction(possibility[1], possibility[0], conf)
         self.log(2, "----------------------------------\n")
 
@@ -268,3 +272,21 @@ class Automaton:
                 if len(self.instructions[state][value]) > 1:
                     return False
         return True
+
+    def to_text(self, file):
+        with open(file, "w") as out_file:
+            for key, value in self.definition.items():
+                if key != "instructions":
+                    if type(value) is list:
+                        out_file.write("{}: {}\n".format(
+                            key, ", ".join(value)))
+                    else:
+                        out_file.write("{}: {}\n".format(key, value))
+                else:
+                    for state, instructions in value.items():
+                        for window, possible_outcomes in instructions.items():
+                            for new_state, instruction in possible_outcomes:
+                                sting_window = "".join(item[1:-1] for item in
+                                                       window[1:-1].split(", "))
+                                out_file.write(
+                                    "{} {} -> {} {}\n".format(state, sting_window, new_state, instruction))

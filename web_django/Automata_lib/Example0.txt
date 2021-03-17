@@ -1,0 +1,13 @@
+state0: q0
+position0: 0
+alphabet: bc$ad#[ab][a[b]]
+size_of_window: 3
+name: New Automat
+type: RRWW
+doc_string: Nothing jet
+instructions:
+q0 aaa -> q0 MVR
+q0 aab -> q0 MVR
+q0 abb -> q0 MVR
+q0 aac -> q0 MVR
+q0 aaa -> q0 MVR

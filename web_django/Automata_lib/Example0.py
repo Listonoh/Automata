@@ -1,5 +1,4 @@
 import sys
-import os
 
 from automata import Automaton
 
@@ -41,3 +40,5 @@ sys.stdin.readline()
 print(a.iterate_text("#aaabbbbbbd$"))  # True
 sys.stdin.readline()
 print(a.iterate_text("#aaabbbbb$"))  # False
+
+a.to_text("Example00.txt")
