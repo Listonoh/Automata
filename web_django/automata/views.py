@@ -1,9 +1,9 @@
 import json
-import logging
+# import logging
 
-from Automata_lib.automata import Automaton
-from django.db import models
-from django.http import Http404, HttpResponse, HttpResponseRedirect
+from Automata_lib import Automaton
+# from django.db import models
+from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
 from .forms import InputAutomata, InputInt, InputWord
@@ -44,7 +44,7 @@ def automata_form(
 
 
 def create_automat_from_form(request):
-    form = InputAutomata(request.POST, request.FILES)
+    # form = InputAutomata(request.POST, request.FILES)
     au = Automaton()
     if request.FILES:
         a = request.FILES['file']
