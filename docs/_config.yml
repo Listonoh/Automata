@@ -1,4 +1,19 @@
-theme: jekyll-theme-cayman
-nav: 
-  - home: index.md
-  - page2: page2.md
+site_name: Automata Docs
+site_dir: build
+theme: readthedocs
+docs_dir: handbook
+repo_url: https://github.com/Listonoh/Automata
+plugins:
+    - search
+    - mkdocs-simple-hooks:
+        hooks:
+          on_pre_build: "hooks.build:update_templated"
+          on_serve: "hooks.build:include_hook_files"
+markdown_extensions:
+    - fenced_code
+    - admonition
+    - toc:
+        permalink: "#"
+nav:
+    - Introduction: index.md
+    - Page2: page2.md
