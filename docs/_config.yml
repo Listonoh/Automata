@@ -1,1 +1,4 @@
 theme: jekyll-theme-cayman
+nav: 
+  - home: index.md
+  - page2: page2.md
