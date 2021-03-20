@@ -34,8 +34,8 @@ a.add_instr("qd", "abb", "qr", "[]")
 
 print(a.alphabet)
 
-print(a.iterate_text("#aaabbbc$"))  # true
+print(a.iterate_tape("#aaabbbc$"))  # true
 input()
-print(a.iterate_text("#aaabbbbbbd$"))  # True
+print(a.iterate_tape("#aaabbbbbbd$"))  # True
 input()
-print(a.iterate_text("#aaabbbbb$"))  # False
+print(a.iterate_tape("#aaabbbbb$"))  # False

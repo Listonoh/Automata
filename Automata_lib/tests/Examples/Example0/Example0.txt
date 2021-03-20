@@ -1,7 +1,7 @@
 state0: q0
 position0: 0
 alphabet: $, c, a, d, b, #
-sAcc: t, 0, s, Accept
+accepting_states: Accept
 size_of_window: 3
 name: Clear automaton
 type: None
