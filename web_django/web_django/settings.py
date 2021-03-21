@@ -25,7 +25,7 @@ SECRET_KEY = 'w-p1dpbn(v(zd7dvxz23j3tj&pu&mbj=_dszelbn$2c^1p5*@c'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ["popelka.ms.mff.cuni.cz"]
+ALLOWED_HOSTS = ["popelka.ms.mff.cuni.cz", "127.0.0.1"]
 
 
 # Application definition
