@@ -30,71 +30,60 @@ class Automaton:
     size_of_window = 1
     name = "Clear automaton"
     type = "None"
-    doc_string_for_instance_of_automaton = "This is clear automaton"
+    doc_string = "This is clear automaton"
     instructions = {}
     output = False
     logs = ""
 
-    def __init__(self, file="", out_mode=4, output=False):
+    def __init__(self, file="", out_mode=1, output=False):
         self.out = out_mode
         self.output = output
         if file:
             try:
-                self.log(2, "------------Loading------------")
-                with open(file, mode='r') as inported_file:
-                    self.definition = json.load(inported_file)
-                self.log(
-                    2, "Automaton loaded\n----------------------------------")
+                self.load_from_json_file(file)
             except (FileNotFoundError, FileExistsError):
-                self.log(
-                    2, "\nAutomaton can not be loaded\
-                        \n----------------------------------")
-                return
+                self.log(2, "\nAutomaton can not be loaded")
 
     def log(self, importance, message, end="\n"):
         if self.out >= importance:
             if self.output:
-                self.output(message, end=end)
+                print(message, end=end)
             self.logs += str(message) + end
 
     @property
     def definition(self):
         return {
-            "state0": self.starting_state,
-            "position0": self.starting_position,
+            "starting_state": self.starting_state,
+            "starting_position": self.starting_position,
             "alphabet": list(self.alphabet),
-            "sAcc": list(self.accepting_states),
+            "accepting_states": list(self.accepting_states),
             "size_of_window": self.size_of_window,
             "name": self.name,
             "type": self.type,
-            "doc_string": self.doc_string_for_instance_of_automaton,
+            "doc_string": self.doc_string,
             "instructions": self.instructions,
         }
 
+    def load_from_json_file(self, file: str):
+        with open(file, mode="r") as inported_file:
+            self.load(json.load(inported_file))
+
     def load(self, definition: dict):
-        self.starting_state = definition["state0"]
-        self.starting_position = definition["position0"]
+        self.starting_state = definition["starting_state"]
+        self.starting_position = definition["starting_position"]
         self.alphabet = set(definition["alphabet"])
-        self.accepting_states = set(definition["sAcc"])
+        self.accepting_states = set(definition["accepting_states"])
         self.size_of_window = definition["size_of_window"]
         self.name = definition["name"]
         self.type = definition["type"]
-        self.doc_string_for_instance_of_automaton = definition["doc_string"]
+        self.doc_string = definition["doc_string"]
         self.instructions = definition["instructions"]
 
     def clear(self):
-        self.log(
-            2, "Loading clear automaton, \n Init State is 'st0' and window\
-                 size is set to 1 \n Accepting state is 'st0'")
-        self.starting_state = "st0"
-        self.starting_position = 0
-        self.alphabet = set()
-        self.accepting_states = set("st0")
-        self.size_of_window = 1
-        self.name = "Clear automaton"
-        self.type = "None"
-        self.doc_string_for_instance_of_automaton = "This is clear automaton"
-        self.instructions = {}
+        self.log(2, "Loading clear automaton,")
+        self.log(2, "Init State is 'st0' and window size is set to 1")
+        self.log(2, "Accepting state is 'st0'")
+        self = Automaton()
 
     def add_to_alphabet(self, *chars):
         for ch in chars:
@@ -115,75 +104,70 @@ class Automaton:
                 return return_arr
         return return_arr
 
-    def __make_instruction(self, instruction: str,
-                           new_state: str, stat: configuration):
-        position = stat.position
-        end_position = self.size_of_window + position
-
-        if instruction == "MVR":
-            conf = configuration(new_state, position + 1,
-                                 stat.text_version, stat)
-            self.configs.append(conf)
-        elif instruction == "MVL":
-            conf = configuration(new_state, position - 1,
-                                 stat.text_version, stat)
-            self.configs.append(conf)
-        elif instruction == "Restart":
-            conf = configuration(new_state, 0, stat.text_version, stat)
-            self.configs.append(conf)
-        elif instruction == "Accept":
-            conf = configuration(new_state, 0, stat.text_version, stat)
-            self.configs.append(conf)
-        # matching rewrites, for remove use "[]"
-        elif re.match(r"^\[.*\]$", instruction):
-            # new copy of current state
-            new_list = self.texts[stat.text_version].copy()
-            new_values = eval(instruction)  # making array from string
-            new_list[position: end_position] = new_values  # rewriting
-
-            self.texts.append(new_list)
-            conf = configuration(new_state, stat.position,
-                                 len(self.texts) - 1, stat)
-            self.configs.append(conf)
-        return
-
-    def add_instr(self, from_state: str, value, to_state: str,
-                  instruction: str, value_as_list: bool = False) -> bool:
+    def add_instr(
+        self, from_state: str, window_value, to_state: str, instruction: str,
+    ) -> bool:
         """
         Does not rewrite if exist, see replace_instruction
         modify delta[from_state, value] -> [state, instruction]
         return False if instruction exists / True otherwise
         """
-        if not value_as_list:
-            value = str(list(value))
-        if from_state not in self.instructions:
-            self.instructions[from_state] = {value: []}
 
-        if value not in self.instructions[from_state]:
-            self.instructions[from_state][value] = []
-        if [to_state, instruction] in self.instructions[from_state][value]:
+        # normalize list
+        if not type(window_value) is list:
+            window_value = str(list(window_value))
+
+        if from_state not in self.instructions:
+            self.instructions[from_state] = {window_value: []}
+
+        if window_value not in self.instructions[from_state]:
+            self.instructions[from_state][window_value] = []
+        if [to_state, instruction] in self.instructions[from_state][window_value]:
             return False
-        self.instructions[from_state][value].append([to_state, instruction])
+        self.instructions[from_state][window_value].append(
+            [to_state, instruction])
         return True
 
     def replace_instructions(self, from_state, value, to_state, instruction):
-        self.instructions[from_state][value] = [
-            [to_state, instruction]]
+        self.instructions[from_state][value] = [[to_state, instruction]]
 
-    def __move(self, window, conf):
+    def __do_instruction(self, instruction: str, new_state: str, stat: configuration):
+        position = stat.position
+        end_position = self.size_of_window + position
+        text_version = stat.text_version
+
+        if instruction == "MVR":
+            position += 1
+        elif instruction == "MVL":
+            position -= 1
+        elif instruction == "Restart":
+            position = 0
+        elif instruction == "Accept":
+            position = 0
+        elif re.match(
+            r"^\[.*\]$", instruction
+        ):  # matching rewrites, for remove use "[]"
+            # new copy of current state
+            new_list = self.texts[stat.text_version].copy()
+            new_values = eval(instruction)  # making array from string
+            new_list[position:end_position] = new_values  # rewriting
+
+            self.texts.append(new_list)
+            text_version = len(self.texts) - 1
+        else:
+            raise Exception("unexpected instruction")
+        new_conf = configuration(new_state, position, text_version, stat)
+        self.configs.append(new_conf)
+
+    def __move(self, window, conf: configuration):
         possibilities = self.instructions[conf.state]
         if "['*']" in possibilities:  # for all possibilities do this
             for possibility in possibilities["['*']"]:
-                self.log(2, ">instruction: * -> new_state: ***")
-                self.__make_instruction(possibility[1], possibility[0], conf)
+                self.__do_instruction(possibility[1], possibility[0], conf)
         for possibility in possibilities[window]:
-            self.log(
-                2, f">instruction: {window} -> new_state: {possibility[0]},\
-                     instruction: {possibility[1]}  ")
-            self.__make_instruction(possibility[1], possibility[0], conf)
-        self.log(2, "----------------------------------\n")
+            self.__do_instruction(possibility[1], possibility[0], conf)
 
-    def __get_window(self, text, position):
+    def __get_window(self, text: str, position: int):
         end_of_pos = position + self.size_of_window
         return str(text[position:end_of_pos])
 
@@ -222,8 +206,14 @@ class Automaton:
                     self.log(3, ", ", end="")
             self.log(3, f"] {config.state}")
 
-    def iterate_text(self, text):
-        self.texts = [self.__parse_text_to_list(text)]
+    def dfs_search(self, configs):
+        pass
+
+    def bfs_search(self, configs):
+        pass
+
+    def iterate_tape(self, tape):
+        self.texts = [self.__parse_text_to_list(tape)]
         self.paths_of_stats = [[0]]
         starting_status = configuration(
             self.starting_state, self.starting_position, 0)
@@ -256,13 +246,14 @@ class Automaton:
         for state in self.instructions:
             print(f"states: {state}: <", end="")
             for value in self.instructions[state]:
-                print(f" \"{value}\" : [", end="")
+                print(f' "{value}" : [', end="")
                 for instruct in self.instructions[state][value]:
                     print(f"{instruct}", end="")
                 print("]")
             print(">")
 
     def save_instructions(self, to):
+        self.alphabet = sorted(self.alphabet)
         with open(to, "w") as to_file:
             json.dump(self.definition, to_file)
 
@@ -272,21 +263,3 @@ class Automaton:
                 if len(self.instructions[state][value]) > 1:
                     return False
         return True
-
-    def to_text(self, file):
-        with open(file, "w") as out_file:
-            for key, value in self.definition.items():
-                if key != "instructions":
-                    if type(value) is list:
-                        out_file.write("{}: {}\n".format(
-                            key, ", ".join(value)))
-                    else:
-                        out_file.write("{}: {}\n".format(key, value))
-                else:
-                    for state, instructions in value.items():
-                        for window, possible_outcomes in instructions.items():
-                            for new_state, instruction in possible_outcomes:
-                                sting_window = "".join(item[1:-1] for item in
-                                                       window[1:-1].split(", "))
-                                out_file.write(
-                                    "{} {} -> {} {}\n".format(state, sting_window, new_state, instruction))
