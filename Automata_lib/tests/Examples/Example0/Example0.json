@@ -1,8 +1,8 @@
 {
-  "state0": "q0",
-  "position0": 0,
-  "alphabet": ["b", "c", "$", "a", "d", "#"],
-  "sAcc": ["Accept"],
+  "starting_state": "q0",
+  "starting_position": "0",
+  "alphabet": ["#", "$", "a", "b", "c", "d"],
+  "accepting_states": ["Accept"],
   "size_of_window": 3,
   "name": "Clear automaton",
   "type": "None",
@@ -23,9 +23,7 @@
       "['b', 'c', '$']": [["qc", "MVL"]],
       "['b', 'd', '$']": [["qd", "MVL"]]
     },
-    "qr": {
-      "['*']": [["q0", "Restart"]]
-    },
+    "qr": { "['*']": [["q0", "Restart"]] },
     "qc": {
       "['a', 'b', 'c']": [["qr", "['c']"]],
       "['b', 'b', 'c']": [["qc", "MVL"]],
