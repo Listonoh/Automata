@@ -27,10 +27,13 @@ class Text_Automaton(Automaton):
         else:
             self.__load_instruction(line)
 
+    def load_from_string(self, lines):
+        for line in lines:
+            self.__load_line(line)
+
     def load_text(self, file_name):
         with open(file_name, "r") as file:
-            for line in file:
-                self.__load_line(line)
+            self.load_from_string(file)
 
     def __stringify_instructions(self, value):
         return_value = []
