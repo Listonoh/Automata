@@ -1,6 +1,6 @@
 site_name: Automata Docs
 site_dir: build
-theme: readthedocs
+theme: Cayman
 docs_dir: handbook
 repo_url: https://github.com/Listonoh/Automata
 plugins:
