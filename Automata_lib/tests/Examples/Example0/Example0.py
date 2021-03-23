@@ -2,7 +2,7 @@ from Automata_lib.automata_class import Automaton
 
 # accept language { a^n b^n c | n >= 0 } union { a^n b^2n d | n >= 0}
 
-a = Automaton(output=print, out_mode=2)
+a = Automaton(output=print, out_mode=3)
 
 a.starting_position = 0
 a.size_of_window = 3
@@ -34,7 +34,7 @@ a.add_instr("qd", "abb", "qr", "[]")
 
 print(a.alphabet)
 
-print(a.iterate_tape("#aaabbbc$"))  # true
+print(a.iterate_tape("#aaabbbc$"))  # True
 input()
 print(a.iterate_tape("#aaabbbbbbd$"))  # True
 input()
