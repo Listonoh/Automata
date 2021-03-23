@@ -13,15 +13,33 @@ class configuration:
     state: str
     position: int
     text_version: int
+    end_of_cycle: bool = False
     father: Type["configuration"] = None
+    highlight_start = '<b>'
+    highlight_end = "</b>"
 
     def __str__(self):
         return f"state: {self.state}, position: {self.position},\
          text_version: {self.text_version} "
 
+    def stringify(self, text: list, size_of_window):
+        a = [text[i] for i in range(len(text))]
+        start_bold = self.position
+        end_bold = min(self.position + size_of_window-1, len(a) - 1)
+        a[start_bold] = self.highlight_start + a[start_bold]
+        a[end_bold] = a[end_bold] + self.highlight_end
+
+        return ", ".join(a)
+
+
+class OutputModes:
+    INSTRUCTIONS = 1
+    CYCLES = 2
+    RESULT = 3
+
 
 class Automaton:
-    out = 4
+    out = 1
     configs = []
     starting_state = "st0"
     starting_position = 0
@@ -45,6 +63,8 @@ class Automaton:
                 self.log(2, "\nAutomaton can not be loaded")
 
     def log(self, importance, message, end="\n"):
+        # if importance in self.output_modes:
+        #     pass
         if self.out >= importance:
             if self.output:
                 print(message, end=end)
@@ -135,6 +155,7 @@ class Automaton:
         position = stat.position
         end_position = self.size_of_window + position
         text_version = stat.text_version
+        restarted = False
 
         if instruction == "MVR":
             position += 1
@@ -142,11 +163,11 @@ class Automaton:
             position -= 1
         elif instruction == "Restart":
             position = 0
+            restarted = True
         elif instruction == "Accept":
             position = 0
-        elif re.match(
-            r"^\[.*\]$", instruction
-        ):  # matching rewrites, for remove use "[]"
+        elif re.match(r"^\[.*\]$", instruction):
+            # matching rewrites, for remove use "[]"
             # new copy of current state
             new_list = self.texts[stat.text_version].copy()
             new_values = eval(instruction)  # making array from string
@@ -156,7 +177,8 @@ class Automaton:
             text_version = len(self.texts) - 1
         else:
             raise Exception("unexpected instruction")
-        new_conf = configuration(new_state, position, text_version, stat)
+        new_conf = configuration(
+            state=new_state, position=position, text_version=text_version, end_of_cycle=restarted, father=stat)
         self.configs.append(new_conf)
 
     def __move(self, window, conf: configuration):
@@ -189,22 +211,13 @@ class Automaton:
         return parsed_text
 
     def pretty_printer(self, config: configuration):
-        if config is None:
-            return
-        else:
+        if config:
             self.pretty_printer(config.father)
             text = self.texts[config.text_version]
-
-            self.log(3, "[", end="")
-            for i in range(len(text)):
-                if config.position <= i < config.position + self.size_of_window:
-                    # self.log(3, Fore.RED + str(text[i]), end="")
-                    self.log(3, "<b>" + str(text[i]) + "</b>", end="")
-                else:
-                    self.log(3, str(text[i]), end="")
-                if i < len(text):
-                    self.log(3, ", ", end="")
-            self.log(3, f"] {config.state}")
+            if config.end_of_cycle:
+                self.log(2, config.stringify(text, self.size_of_window))
+            else:
+                self.log(3, config.stringify(text, self.size_of_window))
 
     def dfs_search(self, configs):
         pass
@@ -212,7 +225,7 @@ class Automaton:
     def bfs_search(self, configs):
         pass
 
-    def iterate_tape(self, tape):
+    def iterate_tape(self, tape) -> bool:
         self.texts = [self.__parse_text_to_list(tape)]
         self.paths_of_stats = [[0]]
         starting_status = configuration(
@@ -224,12 +237,8 @@ class Automaton:
                 conf = self.configs.pop()
                 if conf.state == "Accept":
                     raise Exception("Accepting state")
-                self.log(2, f"     > taking status : {conf}")
                 window = self.__get_window(
                     self.texts[conf.text_version], conf.position)
-                self.log(2, f" text: {self.texts[conf.text_version]}")
-                self.log(2, f" window: {window}")
-
                 self.__move(window, conf)
             except:
                 if conf.state in self.accepting_states:

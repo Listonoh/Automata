@@ -8,7 +8,7 @@ from Automata_lib import Automaton
 from django.http import Http404
 from django.shortcuts import get_object_or_404, render
 
-from .forms import InputAutomata, InputInt, InputWord
+from .forms import InputAutomata, InputInt, InputWord, InputLogLevel
 from .models import Automata
 
 
@@ -78,7 +78,7 @@ def playground(reqest, automat_id):
     automat = get_object_or_404(Automata, pk=automat_id)
     context = {
         "automat": automat,
-        "log_level": InputInt(),
+        "log_level": InputLogLevel(),
         "automat_id": automat_id,
         "InputWord": InputWord(),
     }
@@ -100,7 +100,10 @@ def result(request, automat_id):
         try:
             automat = Automata.objects.get(pk=automat_id)
             text = request.POST["word"]
-            log_level = int(request.POST["number"])
+            log_level = 0
+            if request.POST["log_level"] in ["result", "cycles", "instructions"]:
+                log_level = ["result", "cycles", "instructions"].index(
+                    request.POST["log_level"])
             a = Automaton(out_mode=log_level)
             a.load(automat.json_specification)
             correct = a.iterate_tape(text)
