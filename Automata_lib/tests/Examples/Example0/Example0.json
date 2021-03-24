@@ -1,6 +1,6 @@
 {
   "starting_state": "q0",
-  "starting_position": "0",
+  "starting_position": 0,
   "alphabet": ["#", "$", "a", "b", "c", "d"],
   "accepting_states": ["Accept"],
   "size_of_window": 3,

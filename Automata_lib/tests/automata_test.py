@@ -50,3 +50,10 @@ def test_from_text_to_text():
 
     filecmp.clear_cache()
     assert filecmp.cmp(f1, f4)
+
+
+def test_accepting_word():
+    a = Text_Automaton(file=f3)
+    assert a.iterate_word("#aaabbbc$") and\
+        a.iterate_word("#aaabbbbbbd$") and\
+        not a.iterate_word("#aaabbbbb$")

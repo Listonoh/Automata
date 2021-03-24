@@ -22,7 +22,7 @@ class configuration:
         return f"state: {self.state}, position: {self.position},\
          text_version: {self.text_version} "
 
-    def stringify(self, text: list, size_of_window):
+    def stringify(self, text: list, size_of_window: int):
         a = [text[i] for i in range(len(text))]
         start_bold = self.position
         end_bold = min(self.position + size_of_window-1, len(a) - 1)
@@ -90,10 +90,10 @@ class Automaton:
 
     def load(self, definition: dict):
         self.starting_state = definition["starting_state"]
-        self.starting_position = definition["starting_position"]
+        self.starting_position = int(definition["starting_position"])
         self.alphabet = set(definition["alphabet"])
         self.accepting_states = set(definition["accepting_states"])
-        self.size_of_window = definition["size_of_window"]
+        self.size_of_window = int(definition["size_of_window"])
         self.name = definition["name"]
         self.type = definition["type"]
         self.doc_string = definition["doc_string"]
@@ -225,8 +225,8 @@ class Automaton:
     def bfs_search(self, configs):
         pass
 
-    def iterate_tape(self, tape) -> bool:
-        self.texts = [self.__parse_text_to_list(tape)]
+    def iterate_word(self, word) -> bool:
+        self.texts = [self.__parse_text_to_list(word)]
         self.paths_of_stats = [[0]]
         starting_status = configuration(
             self.starting_state, self.starting_position, 0)
