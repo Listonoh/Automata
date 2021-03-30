@@ -8,13 +8,14 @@
 - check if automata is monotonic
 - presenting automata on web with simulation / which allow users to test automata with theirs own words
 
-# 2. Related work / all "math"
+# 2. Related work
 
-- what was done
+- libraries for work with automata "fado", grail
+- what was done (up)
 - related work with automata
 - usage on reduction analysis of natural languages
 - what is automaton
-- rrww ....
+- rrww .... definitions, constrains, monotonic
 
 # 3. Analysis
 
@@ -24,6 +25,9 @@
 - why I used django and not flask
 - how i get here / what I tried and fail and what succeed
 - what libraries and algorithms was chosen and why alternatives and pros and cons
+
+=> nic takoveho neexistuje... jiny model a pro tento model nic nebylo
+peter Cerno
 
 # 4. Specifications
 
@@ -44,12 +48,11 @@
 - text
 - json
 
-## structure
+## Structure
 
 - what is in library
 - specific methods from library and theirs
 - how is the project structured / web and library + library methods
-- tests?
 
 ## methods
 
@@ -57,6 +60,12 @@
 - constrains -> RRWW RRW ...
 - speed of algorithm
 - correctness of methods
+
+# 6. Experiments / tests
+
+- how long it takes
+- some automata
+- hardware test - specification
 
 # 6. User documentation
 
@@ -73,3 +82,4 @@
 # 8. conclusion
 
 # literature
+link https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"______searchform___butsearch"%3A"Vyhledat"https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"______facetform___facets___workType"%3A%5B"BP"%5Dhttps://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"PNzzpSearchListbasic"%3A1%7D&lang=cs
