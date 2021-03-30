@@ -1,4 +1,4 @@
-# Introduction
+# 1. Introduction
 
 - implement software tool for experiments with restarting automata
 - should be able to straightforward design, simulate, store and test given automata
@@ -8,7 +8,7 @@
 - check if automata is monotonic
 - presenting automata on web with simulation / which allow users to test automata with theirs own words
 
-# Related work / all "math"
+# 2. Related work / all "math"
 
 - what was done
 - related work with automata
@@ -16,7 +16,7 @@
 - what is automaton
 - rrww ....
 
-# Analysis
+# 3. Analysis
 
 - why i choose Python from all languages
 - why i choose json
@@ -25,11 +25,11 @@
 - how i get here / what I tried and fail and what succeed
 - what libraries and algorithms was chosen and why alternatives and pros and cons
 
-# Specifications
+# 4. Specifications
 
 - similar to introduction but detailed
 
-# Development / Design
+# 5. Development / Design
 
 - how it all works together
 
@@ -58,18 +58,18 @@
 - speed of algorithm
 - correctness of methods
 
-# User documentation
+# 6. User documentation
 
 - how to install
 - how to use
 - tutorials / scenarios
 
-# Programmer documentation
+# 7. Programmer documentation
 
 - format of protocols that communicate with server/web client
 - how to expand types
 - how to expand tests
 
-# conclusion
+# 8. conclusion
 
 # literature
