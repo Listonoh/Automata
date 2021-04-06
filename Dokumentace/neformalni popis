@@ -1,0 +1,37 @@
+neformalni popis 
+formalni popis 
+a pak jak automat prijima slova a 
+  rozsireni prechodove funkce na slova existuje stav z delta do accepting states
+
+
+harisson introduction to automata nad formal language
+veta dukaz - rigorozne matematicky bez mezer
+  definice - deter nedeter, lang - vzor
+
+restartujici vic info
+jine od chomskeho , vyznacuje se ze cita vickrat a vzdy najde misto a udela prepsani a restartuje se a zacne na kratsim slove
+  zkracovani -> konecnost, casova slozitost, jen linearni pocet kroku
+  hned kvadraticky odhad na slozitost
+  motivace analyzou prirozenych vet 
+    usekanim privlastku a podmetu
+    dostaneme holou vetu o ktere lze pak rozhodnout zda 
+  formalne i neformalne
+
+vsechno definovat slovama nepotrebujeme symboly
+
+
+grail
+  jazyk lisa na popis automatu nejake srovnani (jen konecne automaty)
+  unix - unixovsky filt jeden soubor a na soubor se postavily symbolicke linky, zjistil jak se jmenuje a pak dle vetve vykonal prikaz, a navrhnute na pipeline, v puvodnim byly chyby
+  kdysi davno byl pouzivany a existuji clanky - odkazy?
+  existovalo a neco jeste existuje ale neni dostupna dokumentace proto neni dobre potrebovat
+
+fado
+  celkem dobre popis, bude zit jeste chvilku
+  co se da s tim delat
+  ma smysl pro tvorbu vlastneho
+
+
+dokoncil popis fado, cim se to lisi,
+grail neni udrzovane a nedostatek dokumentace
+cerno co udelal, proc jsem to nerozsiril
