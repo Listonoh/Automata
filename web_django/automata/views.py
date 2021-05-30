@@ -22,7 +22,7 @@ def computed_result(request):
     defin = request.POST["automata"]
     a = Automaton()
     a.load(json.loads(defin))
-    correct = a.iterate_word(text)
+    correct = a.evaluate(text)
     return automata_form(request, False, True, True, json.dumps(a.definition), correct)
 
 
@@ -106,7 +106,7 @@ def result(request, automat_id):
                     request.POST["log_level"])
             a = Automaton(out_mode=log_level)
             a.load(automat.json_specification)
-            correct = a.iterate_word(text)
+            correct = a.evaluate(text)
             context = {"automaton_result": correct, "logs": a.logs.split("\n")}
             return render(request, "automata_pages/result.html", context)
         except KeyError:
