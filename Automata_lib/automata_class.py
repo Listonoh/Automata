@@ -1,11 +1,19 @@
+from dis import Instruction
+import enum
 import itertools
 import json
 import re
 from typing import Type
 # from colorama import Fore, Back, Style, init
 from dataclasses import dataclass
+from xxlimited import Null
 
 # init(autoreset=True)
+
+
+class highlight_types(enum.Enum):
+    web = "web"
+    text = "text"
 
 
 @dataclass
@@ -15,45 +23,47 @@ class configuration:
     text_version: int
     end_of_cycle: bool = False
     father: Type["configuration"] = None
-    highlight_start = '<b>'
-    highlight_end = "</b>"
+    highlight = {"web": ["<b>", "</b>"], "text": ["(", ")"]}
 
     def __str__(self):
         return f"state: {self.state}, position: {self.position},\
          text_version: {self.text_version} "
 
-    def stringify(self, text: list, size_of_window: int):
-        a = [text[i] for i in range(len(text))]
+    def stringify(self, text: list, size_of_window: int, type_of_highlight: highlight_types = highlight_types.web):
+        list_of_text = [i for i in text]
         start_bold = self.position
-        end_bold = min(self.position + size_of_window-1, len(a) - 1)
-        a[start_bold] = self.highlight_start + a[start_bold]
-        a[end_bold] = a[end_bold] + self.highlight_end
+        end_bold = min(self.position + size_of_window-1, len(list_of_text) - 1)
+        list_of_text[start_bold] = self.highlight[type_of_highlight.value][0] + \
+            list_of_text[start_bold]
+        list_of_text[end_bold] = list_of_text[end_bold] + \
+            self.highlight[type_of_highlight.value][1]
 
-        return ", ".join(a)
+        return ", ".join(list_of_text)
 
 
-class OutputModes:
+class OutputMode(enum.Enum):
     INSTRUCTIONS = 1
     CYCLES = 2
     RESULT = 3
 
 
 class Automaton:
-    out = 1
-    configs = []
-    starting_state = "st0"
-    starting_position = 0
-    alphabet = set()
-    accepting_states = set("st0")
+    initial_state = None
     size_of_window = 1
-    name = "Clear automaton"
-    type = "None"
-    doc_string = "This is clear automaton"
+    possible_instructions = ["MVL", "MVR", "[]"]
+    out = OutputMode.INSTRUCTIONS
+    configs = []
+    alphabet = []
+    working_alphabet = []
+    special_symbols = "#$~"
+    name = "Automaton"
+    type = "RLWW"
+    doc_string = ""
     instructions = {}
     output = False
     logs = ""
 
-    def __init__(self, file="", out_mode=1, output=False):
+    def __init__(self, file="", out_mode=OutputMode.INSTRUCTIONS, output=False):
         self.out = out_mode
         self.output = output
         if file:
@@ -63,9 +73,8 @@ class Automaton:
                 self.log(2, "\nAutomaton can not be loaded")
 
     def log(self, importance, message, end="\n"):
-        # if importance in self.output_modes:
-        #     pass
-        if self.out >= importance:
+        print(self.out.value)
+        if self.out.value >= importance:
             if self.output:
                 print(message, end=end)
             self.logs += str(message) + end
@@ -73,10 +82,9 @@ class Automaton:
     @property
     def definition(self):
         return {
-            "starting_state": self.starting_state,
-            "starting_position": self.starting_position,
+            "initial_state": self.initial_state,
             "alphabet": list(self.alphabet),
-            "accepting_states": list(self.accepting_states),
+            "working_alphabet": list(self.working_alphabet),
             "size_of_window": self.size_of_window,
             "name": self.name,
             "type": self.type,
@@ -85,14 +93,13 @@ class Automaton:
         }
 
     def load_from_json_file(self, file: str):
-        with open(file, mode="r") as inported_file:
-            self.load(json.load(inported_file))
+        with open(file, mode="r") as imported_file:
+            self.load(json.load(imported_file))
 
     def load(self, definition: dict):
-        self.starting_state = definition["starting_state"]
-        self.starting_position = int(definition["starting_position"])
+        self.initial_state = definition["initial_state"]
         self.alphabet = set(definition["alphabet"])
-        self.accepting_states = set(definition["accepting_states"])
+        self.working_alphabet = definition["working_alphabet"]
         self.size_of_window = int(definition["size_of_window"])
         self.name = definition["name"]
         self.type = definition["type"]
@@ -102,7 +109,6 @@ class Automaton:
     def clear(self):
         self.log(2, "Loading clear automaton,")
         self.log(2, "Init State is 'st0' and window size is set to 1")
-        self.log(2, "Accepting state is 'st0'")
         self = Automaton()
 
     def add_to_alphabet(self, *chars):
@@ -125,69 +131,96 @@ class Automaton:
         return return_arr
 
     def add_instr(
-        self, from_state: str, window_value, to_state: str, instruction: str,
-    ) -> bool:
+            self, from_state: str, window_value, right_side) -> bool:
         """
         Does not rewrite if exist, see replace_instruction
-        modify delta[from_state, value] -> [state, instruction]
+        modify delta[from_state, value] -> [to_state, instruction] | Accept | Restart
         return False if instruction exists / True otherwise
         """
 
         # normalize list
         if not type(window_value) is list:
             window_value = str(list(window_value))
+        right_side = right_side.split()
 
         if from_state not in self.instructions:
             self.instructions[from_state] = {window_value: []}
 
         if window_value not in self.instructions[from_state]:
             self.instructions[from_state][window_value] = []
-        if [to_state, instruction] in self.instructions[from_state][window_value]:
-            return False
-        self.instructions[from_state][window_value].append(
-            [to_state, instruction])
-        return True
 
-    def replace_instructions(self, from_state, value, to_state, instruction):
-        self.instructions[from_state][value] = [[to_state, instruction]]
+        if len(right_side) == 1:
+            if right_side[0] in self.instructions[from_state][window_value]:
+                return False
+            else:
+                self.instructions[from_state][window_value].append(
+                    right_side[0])
+                return True
+        elif len(right_side) == 2:
+            to_state = right_side[0]
+            instruction = right_side[1]
+            if right_side[1] not in self.possible_instructions:
+                instruction = str(self.__parse_text_to_list(right_side[1]))
 
-    def __do_instruction(self, instruction: str, new_state: str, stat: configuration):
+            if [to_state, instruction] in self.instructions[from_state][window_value]:
+                return False
+            self.instructions[from_state][window_value].append(
+                [to_state, instruction])
+            return True
+
+    # def replace_instructions(self, from_state, value, to_state, instruction):
+    #     self.instructions[from_state][value] = [[to_state, instruction]]
+
+    def __do_instruction(self, right_side, stat: configuration):
         position = stat.position
         end_position = self.size_of_window + position
         text_version = stat.text_version
         restarted = False
-
-        if instruction == "MVR":
-            position += 1
-        elif instruction == "MVL":
-            position -= 1
-        elif instruction == "Restart":
-            position = 0
-            restarted = True
-        elif instruction == "Accept":
-            position = 0
-        elif re.match(r"^\[.*\]$", instruction):
-            # matching rewrites, for remove use "[]"
-            # new copy of current state
-            new_list = self.texts[stat.text_version].copy()
-            new_values = eval(instruction)  # making array from string
-            new_list[position:end_position] = new_values  # rewriting
-
-            self.texts.append(new_list)
-            text_version = len(self.texts) - 1
+        accepted = False
+        to_state = Null
+        if type(right_side) is str:
+            if right_side == "Restart":
+                position = 0
+                restarted = True
+                to_state = self.initial_state
+            elif right_side == "Accept":
+                accepted = True
+        elif type(right_side) is list and len(right_side) == 2:
+            to_state = right_side[0]
+            instruction = right_side[1]
+            if instruction == "MVR":
+                position += 1
+            elif instruction == "MVL":
+                position -= 1
+            elif re.match(r"^\[.*\]$", instruction):
+                # matching rewrites, for remove use "[]"
+                # new copy of current state
+                new_list = self.texts[stat.text_version].copy()
+                new_values = eval(instruction)  # making array from string
+                new_list[position:end_position] = new_values  # rewriting
+                self.texts.append(new_list)
+                text_version = len(self.texts) - 1
         else:
             raise Exception("unexpected instruction")
-        new_conf = configuration(
-            state=new_state, position=position, text_version=text_version, end_of_cycle=restarted, father=stat)
-        self.configs.append(new_conf)
+        if not accepted:
+            new_conf = configuration(
+                state=to_state, position=position, text_version=text_version, end_of_cycle=restarted, father=stat)
+            self.configs.append(new_conf)
+            return False
+        else:
+            return True
 
     def __move(self, window, conf: configuration):
-        possibilities = self.instructions[conf.state]
-        if "['*']" in possibilities:  # for all possibilities do this
-            for possibility in possibilities["['*']"]:
-                self.__do_instruction(possibility[1], possibility[0], conf)
-        for possibility in possibilities[window]:
-            self.__do_instruction(possibility[1], possibility[0], conf)
+        possible_windows = self.instructions[conf.state]
+        if "['*']" in possible_windows:
+            for right_side in possible_windows["['*']"]:
+                if self.__do_instruction(right_side, conf):
+                    return True
+        elif window in possible_windows.keys():
+            for right_side in possible_windows[window]:
+                if self.__do_instruction(right_side, conf):
+                    return True
+        return False
 
     def __get_window(self, text: str, position: int):
         end_of_pos = position + self.size_of_window
@@ -222,34 +255,27 @@ class Automaton:
     def dfs_search(self, configs):
         pass
 
-    def bfs_search(self, configs):
-        pass
+    def bfs_search(self):
+        while self.configs:
+            conf = self.configs.pop()
+            window = self.__get_window(
+                self.texts[conf.text_version], conf.position)
+            if self.__move(window, conf):
+                self.log(2, f"remaining tuples = {self.configs}")
+                self.log(
+                    2, f"number of copies of text = {len(self.texts)}")
+                self.pretty_printer(conf)
+                return True
+        return False
 
-    def iterate_word(self, word) -> bool:
+    def evaluate(self, word) -> bool:
         self.texts = [self.__parse_text_to_list(word)]
         self.paths_of_stats = [[0]]
         starting_status = configuration(
-            self.starting_state, self.starting_position, 0)
+            self.initial_state, 0, 0)
         self.configs = [starting_status]
         self.log(2, self.texts[0])
-        while True:
-            try:
-                conf = self.configs.pop()
-                if conf.state == "Accept":
-                    raise Exception("Accepting state")
-                window = self.__get_window(
-                    self.texts[conf.text_version], conf.position)
-                self.__move(window, conf)
-            except:
-                if conf.state in self.accepting_states:
-                    self.log(2, f"remaining tuples = {self.configs}")
-                    self.log(
-                        2, f"number of copies of text = {len(self.texts)}")
-                    self.pretty_printer(conf)
-                    return True
-                elif self.configs.__len__() == 0:
-                    return False
-        return "Error shouldn't get here"
+        return self.bfs_search()
 
     def print_instructions(self):
         for state in self.instructions:
@@ -263,6 +289,7 @@ class Automaton:
 
     def save_instructions(self, to):
         self.alphabet = sorted(self.alphabet)
+        self.working_alphabet = sorted(self.working_alphabet)
         with open(to, "w") as to_file:
             json.dump(self.definition, to_file)
 

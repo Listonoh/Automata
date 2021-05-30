@@ -3,18 +3,18 @@ from Automata_lib import Automaton
 
 class Text_Automaton(Automaton):
     def __load_key(self, key, rest_of_line):
-        if key in ["accepting_states", "alphabet"]:
-            setattr(self, key, [i.strip() for i in rest_of_line.split(",")])
+        if key in ["alphabet", "working_alphabet"]:
+            setattr(self, key, [] if rest_of_line == "" else [i.strip()
+                                                              for i in rest_of_line.split(",")])
         elif key == "size_of_window":
             self.size_of_window = int(rest_of_line)
         else:
             setattr(self, key, rest_of_line)
 
     def __load_instruction(self, line: str):
-        first_part, second_part = line.split("->")
+        first_part, right_side = line.split("->")
         from_state, window = first_part.strip().split()
-        to_state, instruction = second_part.strip().split()
-        self.add_instr(from_state, window, to_state, instruction)
+        self.add_instr(from_state, window, right_side)
 
     def __load_line(self, line: str):
         line = line.replace("\n", "")
@@ -22,6 +22,7 @@ class Text_Automaton(Automaton):
         key = parsed_line[0].strip()
 
         if key in self.definition.keys():
+            # parsed line pherhaps
             rest_of_line = line[len(parsed_line[0]) + 1:].lstrip()
             self.__load_key(key, rest_of_line)
         else:
@@ -39,13 +40,24 @@ class Text_Automaton(Automaton):
         return_value = []
         for state, instructions in value.items():
             for window, possible_outcomes in instructions.items():
-                for new_state, instruction in possible_outcomes:
+                for right_side in possible_outcomes:
                     sting_window = "".join(
                         item[1:-1] for item in window[1:-1].split(", ")
                     )
-                    return_value.append("{} {} -> {} {}".format(
-                        state, sting_window, new_state, instruction
-                    ))
+                    if type(right_side) is list:
+                        instruction = right_side[1]
+                        if instruction not in self.possible_instructions:
+                            instruction = "".join(eval(right_side[1]))
+                        return_value.append("{} {} -> {} {}".format(
+                            state, sting_window, right_side[0], instruction
+                        )
+                        )
+                    elif type(right_side) is str:
+                        return_value.append("{} {} -> {}".format(
+                            state, sting_window, right_side
+                        )
+                        )
+
         return "\n".join(return_value)
 
     def __stringify_line_for_save(self, key, value) -> str:
@@ -63,3 +75,4 @@ class Text_Automaton(Automaton):
             for key, value in self.definition.items():
                 out_file.write(
                     self.__stringify_line_for_save(key, value) + "\n")
+            out_file.close()
