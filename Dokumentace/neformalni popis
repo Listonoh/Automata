@@ -35,3 +35,43 @@ fado
 dokoncil popis fado, cim se to lisi,
 grail neni udrzovane a nedostatek dokumentace
 cerno co udelal, proc jsem to nerozsiril
+
+
+GUItar is a library for creating graphs visualy [ciaa09]. 
+GUItar enable to export diagrams to multiple formats mainly in its own XML format based on dialect of the GraphML language [].
+GraphML was build with extensibility in mind and is flexible extension mechanism to add application specific data.
+The other export formats are: \emph{basic GraphML}, \emph{dot} and \emph{Vaucanson-g}[].
+GUItar can import from GraphML and FAdo automata format (described below)
+
+
+# formats for storing automata
+dot, GraphML, EFSM, grail, FAdo and TikZ(for LaTeX)
+
+- examples for language (a+b) i.e. accepts "a" or "b"
+``` grail
+(START) |- 0
+0 a 1
+0 b 3
+1 -| (FINAL)
+3 -| (FINAL)
+```
+
+
+
+The FAdo []  
+
+```fado
+@DFA 1 3
+0 a 1
+0 b 3
+
+```
+
+EFSM - format for storing automata
+stores automaton in multiple files, one or two files to describe the labels and one to list the transitions. More [FSM Man Page](https://web.archive.org/web/20141006203106/http://www2.research.att.com/~fsmtools/fsm/man4/fsm.5.html)
+
+
+Vcsn (Vaucanson)
+python docs - http://vcsn-sandbox.lrde.epita.fr/notebooks/Doc/!Read-me-first.ipynb
+
+TikZ - LaTeX syntax for drawing automata.

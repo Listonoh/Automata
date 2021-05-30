@@ -67,19 +67,20 @@ peter Cerno
 - some automata
 - hardware test - specification
 
-# 6. User documentation
+# 7. User documentation
 
 - how to install
 - how to use
 - tutorials / scenarios
 
-# 7. Programmer documentation
+# 8. Programmer documentation
 
 - format of protocols that communicate with server/web client
 - how to expand types
 - how to expand tests
 
-# 8. conclusion
+# 9. conclusion
 
 # literature
-link https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"______searchform___butsearch"%3A"Vyhledat"https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"______facetform___facets___workType"%3A%5B"BP"%5Dhttps://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"PNzzpSearchListbasic"%3A1%7D&lang=cs
+
+link [restarting automata - bc ](https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"______searchform___butsearch"%3A"Vyhledat"https://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"______facetform___facets___workType"%3A%5B"BP"%5Dhttps://is.cuni.cz/webapps/zzp/detail/49108/52450341/?q=%7B"______searchform___search"%3A"%5Cu010derno"%2C"______searchform___butsearch"%3A"Vyhledat"%2C"______facetform___facets___workType"%3A%5B"BP"%5D%2C"PNzzpSearchListbasic"%3A1%7D&lang=csC"PNzzpSearchListbasic"%3A1%7D&lang=cs)
