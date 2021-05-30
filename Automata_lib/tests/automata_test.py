@@ -3,16 +3,16 @@ from Automata_lib import Automaton, Text_Automaton
 import json
 import filecmp
 import sys
-f1 = "Automata_lib/tests/Examples/Example0/Example0.txt"
-f2 = "Automata_lib/tests/Examples/Example0/Example0_out.json"
-f3 = "Automata_lib/tests/Examples/Example0/Example0.json"
-f4 = "Automata_lib/tests/Examples/Example0/Example0_out.txt"
+txt_in = "Automata_lib/tests/Examples/Example0/Example0.txt"
+json_out = "Automata_lib/tests/Examples/Example0/Example0_out.json"
+json_in = "Automata_lib/tests/Examples/Example0/Example0.json"
+txt_out = "Automata_lib/tests/Examples/Example0/Example0_out.txt"
 
 
 def __compare_json(file1, file2):
-    open_file1 = open(file1, "r")
-    open_file2 = open(file2, "r")
-    return json.load(open_file1) == json.load(open_file2)
+    with open(file1, "r") as open_file1:
+        with open(file2, "r") as open_file2:
+            return json.load(open_file1) == json.load(open_file2)
 
 
 def test_11():
@@ -23,37 +23,41 @@ def test_11():
 
 def test_from_text_to_json():
     a = Text_Automaton()
-    a.load_text(f1)
-    a.save_instructions(f2)
-    assert __compare_json(f2, f3)
+    a.load_text(txt_in)
+    a.save_instructions(json_out)
+    filecmp.clear_cache()
+    assert __compare_json(json_out, json_in)
 
 
 def test_from_json_to_text():
-    a = Text_Automaton(file=f3)
-    a.save_text(f4)
+    a = Text_Automaton()
+    a.load_from_json_file(json_in)
+    a.save_text(txt_out)
 
     filecmp.clear_cache()
-    assert filecmp.cmp(f1, f4)
+    assert filecmp.cmp(txt_in, txt_out)
 
 
 def test_from_json_to_json():
-    a = Automaton(file=f3)
-    a.save_instructions(f2)
+    a = Automaton(file=json_in)
+    a.save_instructions(json_out)
 
-    assert __compare_json(f2, f3)
+    filecmp.clear_cache()
+    assert __compare_json(json_out, json_in)
 
 
 def test_from_text_to_text():
     a = Text_Automaton()
-    a.load_text(f1)
-    a.save_text(f4)
+    a.load_text(txt_in)
+    a.save_text(txt_out)
 
     filecmp.clear_cache()
-    assert filecmp.cmp(f1, f4)
+    assert filecmp.cmp(txt_in, txt_out)
 
 
 def test_accepting_word():
-    a = Text_Automaton(file=f3)
-    assert a.iterate_word("#aaabbbc$") and\
-        a.iterate_word("#aaabbbbbbd$") and\
-        not a.iterate_word("#aaabbbbb$")
+    a = Text_Automaton()
+    a.load_text(txt_in)
+    assert a.evaluate("#aaabbbc$")
+    assert a.evaluate("#aaabbbbbbd$")
+    assert not a.evaluate("#aaabbbbb$")

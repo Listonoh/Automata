@@ -6,7 +6,7 @@ a = Text_Automaton(output=print, out_mode=3)
 
 a.starting_position = 0
 a.size_of_window = 3
-a.starting_state = "q0"
+a.initial_state = "q0"
 a.add_to_alphabet("#", "$", "a", "b", "c", "d")
 
 a.add_accepting_state("Accept")
@@ -34,8 +34,8 @@ a.add_instr("qd", "abb", "qr", "[]")
 
 print(a.alphabet)
 
-print(a.iterate_word("#aaabbbc$"))  # True
+print(a.evaluate("#aaabbbc$"))  # True
 input()
-print(a.iterate_word("#aaabbbbbbd$"))  # True
+print(a.evaluate("#aaabbbbbbd$"))  # True
 input()
-print(a.iterate_word("#aaabbbbb$"))  # False
+print(a.evaluate("#aaabbbbb$"))  # False
