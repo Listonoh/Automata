@@ -29,7 +29,11 @@ class configuration:
         return f"state: {self.state}, position: {self.position},\
          text_version: {self.text_version} "
 
-    def stringify(self, text: list, size_of_window: int, type_of_highlight: highlight_types = highlight_types.web):
+    def stringify(self, text: list, size_of_window: int, output):
+        type_of_highlight = highlight_types.web
+        if output == print:
+            type_of_highlight = highlight_types.text
+
         list_of_text = [i for i in text]
         start_bold = self.position
         end_bold = min(self.position + size_of_window-1, len(list_of_text) - 1)
@@ -42,9 +46,9 @@ class configuration:
 
 
 class OutputMode(enum.Enum):
-    INSTRUCTIONS = 1
+    INSTRUCTIONS = 3
     CYCLES = 2
-    RESULT = 3
+    RESULT = 1
 
 
 class BaseAutomaton:
@@ -73,7 +77,6 @@ class BaseAutomaton:
                 self.log(2, "\nAutomaton can not be loaded")
 
     def log(self, importance, message, end="\n"):
-        print(self.out.value)
         if self.out.value >= importance:
             if self.output:
                 print(message, end=end)
@@ -252,9 +255,11 @@ class BaseAutomaton:
             self.pretty_printer(config.father)
             text = self.texts[config.text_version]
             if config.end_of_cycle:
-                self.log(2, config.stringify(text, self.size_of_window))
+                self.log(2, config.stringify(
+                    text, self.size_of_window, output=self.output))
             else:
-                self.log(3, config.stringify(text, self.size_of_window))
+                self.log(3, config.stringify(
+                    text, self.size_of_window, output=self.output))
 
     def dfs_search(self, configs):
         pass
