@@ -2,18 +2,30 @@ end 22.7.
 nice end 1.7.
 
 18.5. 
-25.5. analysis + design
-    [] extending
-    [] technical choices
-    [] functions
-    [] design
-    [] non-trivial function
-1.6. analysis + design
-8.6. functional library
-15.6. functional web + completed library
-22.6. user documentation + stress test
-29.6. final version
-6
-13
+25.5. 
+1.6. 
+8.6. 
+15.6. functional library
+    constrains for evaluation
+    check input symbols and symbols in instructions
+    8+ more examples
+    test for constrains
+    advanced function
+    test for advanced function
+    output with states and instructions
+22.6. analysis + design
+    extending
+    technical choices
+    functions
+    design
+    non-trivial function
+29.6. functional web + completed library
+    log-in
+    upload
+    references
+    storage
+6. user documentation + stress test
+    some big automaton to stress test
+13. final version
 20
 22.7.
