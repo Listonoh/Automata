@@ -21,6 +21,8 @@ class configuration:
     state: str
     position: int
     text_version: int
+    rewrite_to: str = ""
+    rewrite_from: str = ""
     end_of_cycle: bool = False
     father: Type["configuration"] = None
     highlight = {"web": ["<b>", "</b>"], "text": ["(", ")"]}
@@ -42,7 +44,11 @@ class configuration:
         list_of_text[end_bold] = list_of_text[end_bold] + \
             self.highlight[type_of_highlight.value][1]
 
-        return ", ".join(list_of_text)
+        rewritten = ""
+        if self.rewrite_to:
+            rewritten = f" | {self.rewrite_from} --> {self.rewrite_to}"
+
+        return ", ".join(list_of_text) + " | state: " + self.state + rewritten
 
 
 class OutputMode(enum.Enum):
@@ -55,7 +61,7 @@ class BaseAutomaton:
     initial_state = None
     size_of_window = 1
     special_instructions = ["MVL", "MVR", "[]"]
-    out = OutputMode.INSTRUCTIONS
+    detail_of_output = OutputMode.INSTRUCTIONS
     configs = []
     alphabet = set()
     working_alphabet = set()
@@ -64,12 +70,10 @@ class BaseAutomaton:
     type = "RLWW"
     doc_string = ""
     instructions = {}
-    output = False
+    output_stream = False
     logs = ""
 
-    def __init__(self, file="", out_mode=OutputMode.INSTRUCTIONS, output=False):
-        self.out = out_mode
-        self.output = output
+    def __init__(self, file=""):
         if file:
             try:
                 self.load_from_json_file(file)
@@ -77,8 +81,8 @@ class BaseAutomaton:
                 self.log(2, "\nAutomaton can not be loaded")
 
     def log(self, importance, message, end="\n"):
-        if self.out.value >= importance:
-            if self.output:
+        if self.detail_of_output.value >= importance:
+            if self.output_stream:
                 print(message, end=end)
             self.logs += str(message) + end
 
@@ -185,6 +189,7 @@ class BaseAutomaton:
         restarted = False
         accepted = False
         to_state = Null
+        rewrite_to = ""
         if type(right_side) is str:
             if right_side == "Restart":
                 position = 0
@@ -203,15 +208,15 @@ class BaseAutomaton:
                 # matching rewrites, for remove use "[]"
                 # new copy of current state
                 new_list = self.texts[stat.text_version].copy()
-                new_values = eval(instruction)  # making array from string
-                new_list[position:end_position] = new_values  # rewriting
+                rewrite_to = eval(instruction)  # making array from string
+                new_list[position:end_position] = rewrite_to  # rewriting
                 self.texts.append(new_list)
                 text_version = len(self.texts) - 1
         else:
             raise Exception("unexpected instruction")
         if not accepted:
             new_conf = configuration(
-                state=to_state, position=position, text_version=text_version, end_of_cycle=restarted, father=stat)
+                state=to_state, position=position, text_version=text_version, end_of_cycle=restarted, father=stat, rewrite_to=str(rewrite_to), rewrite_from=self.texts[stat.text_version][position:end_position])
             self.configs.append(new_conf)
             return False
         else:
@@ -256,10 +261,10 @@ class BaseAutomaton:
             text = self.texts[config.text_version]
             if config.end_of_cycle:
                 self.log(2, config.stringify(
-                    text, self.size_of_window, output=self.output))
+                    text, self.size_of_window, output=self.output_stream))
             else:
                 self.log(3, config.stringify(
-                    text, self.size_of_window, output=self.output))
+                    text, self.size_of_window, output=self.output_stream))
 
     def dfs_search(self, configs):
         pass
@@ -277,7 +282,10 @@ class BaseAutomaton:
                 return True
         return False
 
-    def evaluate(self, word) -> bool:
+    def evaluate(self, word, detail_of_output=OutputMode.INSTRUCTIONS, output_stream=print) -> bool:
+        self.detail_of_output = detail_of_output
+        self.output_stream = output_stream
+
         self.texts = [self.__parse_text_to_list(word)]
         self.paths_of_stats = [[0]]
         starting_status = configuration(

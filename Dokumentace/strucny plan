@@ -6,24 +6,24 @@ nice end 1.7.
 1.6. 
 8.6. 
 15.6. functional library
-    constrains for evaluation
-    check input symbols and symbols in instructions
-    8+ more examples
-    test for constrains
-    advanced function
-    test for advanced function
-    output with states and instructions
+    [] constrains for evaluation
+    [] check input symbols and symbols in instructions
+    [] 8+ more examples
+    [] test for constrains
+    [] advanced function
+    [] test for advanced function
+    [x] output with states and instructions
 22.6. analysis + design
-    extending
-    technical choices
-    functions
-    design
-    non-trivial function
+    [] extending
+    [] technical choices
+    [] functions
+    [] design
+    [] non-trivial function
 29.6. functional web + completed library
-    log-in
-    upload
-    references
-    storage
+    [] log-in
+    [] upload
+    [] references
+    [] storage
 6. user documentation + stress test
     some big automaton to stress test
 13. final version
