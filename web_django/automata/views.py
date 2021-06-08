@@ -2,7 +2,7 @@ import json
 
 # import logging
 
-from Automata_lib import Automaton
+from Automata_lib import BaseAutomaton
 
 # from django.db import models
 from django.http import Http404
@@ -20,7 +20,7 @@ def index(request):
 def computed_result(request):
     text = request.POST["word"]
     defin = request.POST["automata"]
-    a = Automaton()
+    a = BaseAutomaton()
     a.load(json.loads(defin))
     correct = a.evaluate(text)
     return automata_form(request, False, True, True, json.dumps(a.definition), correct)
@@ -57,7 +57,7 @@ def automata_form(
 
 def create_automat_from_form(request):
     # form = InputAutomata(request.POST, request.FILES)
-    au = Automaton()
+    au = BaseAutomaton()
     if request.FILES:
         a = request.FILES["file"]
         b = json.load(a)
@@ -104,7 +104,7 @@ def result(request, automat_id):
             if request.POST["log_level"] in ["result", "cycles", "instructions"]:
                 log_level = ["result", "cycles", "instructions"].index(
                     request.POST["log_level"])
-            a = Automaton(out_mode=log_level)
+            a = BaseAutomaton(out_mode=log_level)
             a.load(automat.json_specification)
             correct = a.evaluate(text)
             context = {"automaton_result": correct, "logs": a.logs.split("\n")}

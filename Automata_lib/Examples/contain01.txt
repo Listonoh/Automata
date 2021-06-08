@@ -1,0 +1,16 @@
+initial_state: q0
+alphabet: 0, 1
+working_alphabet: 
+size_of_window: 2
+name: 01 in middle of word
+type: RLWW
+doc_string: This automaton 
+q0 #1 -> q0 MVR
+q0 #0 -> q0 MVR
+q0 01 -> q1 MVR
+q0 00 -> q0 MVR
+q0 11 -> q0 MVR
+q0 10 -> q0 MVR
+q1 .. -> q1 MVR
+q1 1$ -> Accept
+q1 0$ -> Accept

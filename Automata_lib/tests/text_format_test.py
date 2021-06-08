@@ -1,1 +1,1 @@
-from Automata_lib import Automaton
+from Automata_lib import BaseAutomaton

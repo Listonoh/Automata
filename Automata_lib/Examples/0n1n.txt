@@ -1,0 +1,14 @@
+initial_state: q0
+alphabet: 0, 1
+working_alphabet: 
+size_of_window: 4
+name: 0^n 1^n
+type: RLWW
+doc_string: This automaton 
+q0 #01$ -> Accept
+q0 0001 -> q0 MVR
+q0 0000 -> q0 MVR
+q0 #001 -> q0 MVR
+q0 #000 -> q0 MVR
+q0 0011 -> qr 01
+qr * -> Restart

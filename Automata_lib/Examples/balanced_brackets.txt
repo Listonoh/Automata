@@ -1,0 +1,19 @@
+initial_state: q0
+alphabet: (, ), {, }
+working_alphabet: 
+size_of_window: 2
+name: brackets
+type: RLWW
+doc_string: This automaton 
+q0 #$ -> Accept
+q0 () -> qr []
+q0 {} -> qr []
+q0 (( -> q0 MVR
+q0 )( -> q0 MVR
+q0 )) -> q0 MVR
+q0 {{ -> q0 MVR
+q0 }{ -> q0 MVR
+q0 }} -> q0 MVR
+q0 #{ -> q0 MVR
+q0 #( -> q0 MVR
+qr * -> Restart
