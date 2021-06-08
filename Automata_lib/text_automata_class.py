@@ -1,7 +1,17 @@
-from Automata_lib import Automaton
+from Automata_lib import BaseAutomaton, OutputMode
 
 
-class Text_Automaton(Automaton):
+class Automaton(BaseAutomaton):
+    def __init__(self, file="", out_mode=OutputMode.INSTRUCTIONS, output=False):
+        self.out = out_mode
+        self.output = output
+        self.instructions = {}
+        if file:
+            try:
+                self.load_text(file)
+            except (FileNotFoundError, FileExistsError):
+                self.log(2, "\nAutomaton can not be loaded")
+
     def __load_key(self, key, rest_of_line):
         if key in ["alphabet", "working_alphabet"]:
             setattr(self, key, [] if rest_of_line == "" else [i.strip()
@@ -14,7 +24,11 @@ class Text_Automaton(Automaton):
     def __load_instruction(self, line: str):
         first_part, right_side = line.split("->")
         from_state, window = first_part.strip().split()
-        self.add_instr(from_state, window, right_side)
+        right_side = right_side.split()
+        if len(right_side) == 1:
+            self.add_one_instr(from_state, window, right_side[0])
+        elif len(right_side) == 2:
+            self.add_instr(from_state, window, right_side[0], right_side[1])
 
     def __load_line(self, line: str):
         line = line.replace("\n", "")
@@ -34,7 +48,9 @@ class Text_Automaton(Automaton):
 
     def load_text(self, file_name):
         with open(file_name, "r") as file:
-            self.load_from_string(file)
+            for line in file:
+                self.__load_line(line)
+            # self.load_from_string(file)
 
     def __stringify_instructions(self, value):
         return_value = []
@@ -46,7 +62,7 @@ class Text_Automaton(Automaton):
                     )
                     if type(right_side) is list:
                         instruction = right_side[1]
-                        if instruction not in self.possible_instructions:
+                        if instruction not in self.special_instructions:
                             instruction = "".join(eval(right_side[1]))
                         return_value.append("{} {} -> {} {}".format(
                             state, sting_window, right_side[0], instruction

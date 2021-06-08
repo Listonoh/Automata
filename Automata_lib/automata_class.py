@@ -47,15 +47,15 @@ class OutputMode(enum.Enum):
     RESULT = 3
 
 
-class Automaton:
+class BaseAutomaton:
     initial_state = None
     size_of_window = 1
-    possible_instructions = ["MVL", "MVR", "[]"]
+    special_instructions = ["MVL", "MVR", "[]"]
     out = OutputMode.INSTRUCTIONS
     configs = []
-    alphabet = []
-    working_alphabet = []
-    special_symbols = "#$~"
+    alphabet = set()
+    working_alphabet = set()
+    special_symbols = "#$*"
     name = "Automaton"
     type = "RLWW"
     doc_string = ""
@@ -109,7 +109,7 @@ class Automaton:
     def clear(self):
         self.log(2, "Loading clear automaton,")
         self.log(2, "Init State is 'st0' and window size is set to 1")
-        self = Automaton()
+        self = BaseAutomaton()
 
     def add_to_alphabet(self, *chars):
         for ch in chars:
@@ -130,43 +130,47 @@ class Automaton:
                 return return_arr
         return return_arr
 
-    def add_instr(
-            self, from_state: str, window_value, right_side) -> bool:
+    def __initialize_instructions(self, from_state, content_of_window):
+
+        if from_state not in self.instructions:
+            self.instructions[from_state] = {content_of_window: []}
+
+        if content_of_window not in self.instructions[from_state]:
+            self.instructions[from_state][content_of_window] = []
+
+    def substituted_dots_in_window(self, window):
+        r = [window]
+        while any(["." in w for w in r]):
+            r = [word.replace(".", symbol, 1)
+                 for symbol in self.alphabet for word in r]
+        return r
+
+    def __check_used_symbols(self, word):
+        return True
+
+    def add_instr(self, from_state: str, content_of_window, to_state: str, instruction: str):
+        for window in self.substituted_dots_in_window(content_of_window):
+            if not type(window) is list:
+                window = str(list(window))
+            self.__initialize_instructions(from_state, window)
+            if instruction not in self.special_instructions:
+                instruction = str(self.__parse_text_to_list(instruction))
+            self.instructions[from_state][window].append(
+                [to_state, instruction])
+
+    def add_one_instr(
+            self, from_state: str, content_of_window, instruction) -> bool:
         """
         Does not rewrite if exist, see replace_instruction
         modify delta[from_state, value] -> [to_state, instruction] | Accept | Restart
         return False if instruction exists / True otherwise
         """
-
-        # normalize list
-        if not type(window_value) is list:
-            window_value = str(list(window_value))
-        right_side = right_side.split()
-
-        if from_state not in self.instructions:
-            self.instructions[from_state] = {window_value: []}
-
-        if window_value not in self.instructions[from_state]:
-            self.instructions[from_state][window_value] = []
-
-        if len(right_side) == 1:
-            if right_side[0] in self.instructions[from_state][window_value]:
-                return False
-            else:
-                self.instructions[from_state][window_value].append(
-                    right_side[0])
-                return True
-        elif len(right_side) == 2:
-            to_state = right_side[0]
-            instruction = right_side[1]
-            if right_side[1] not in self.possible_instructions:
-                instruction = str(self.__parse_text_to_list(right_side[1]))
-
-            if [to_state, instruction] in self.instructions[from_state][window_value]:
-                return False
-            self.instructions[from_state][window_value].append(
-                [to_state, instruction])
-            return True
+        for window in self.substituted_dots_in_window(content_of_window):
+            if not type(window) is list:
+                window = str(list(window))
+            self.__initialize_instructions(from_state, window)
+            self.instructions[from_state][window].append(
+                instruction)
 
     # def replace_instructions(self, from_state, value, to_state, instruction):
     #     self.instructions[from_state][value] = [[to_state, instruction]]
