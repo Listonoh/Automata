@@ -112,6 +112,19 @@ def test_contain_01():
     assert sum_results == len_results
 
 
+def test_example0_without_MVL():
+    a = Automaton(example_folder + "example0_without_MVL.txt")
+    results = [a.evaluate("#abc$"),
+               not a.evaluate("#aaac$"),
+               not a.evaluate("#$"),
+               a.evaluate("#aabbbbd$"),
+               a.evaluate("#aaaabbbbbbbbd$"),
+               not a.evaluate("#(2$")]
+    sum_results = sum(results)
+    len_results = len(results)
+    assert sum_results == len_results
+
+
 def test_dot_to_words():
     a = Automaton()
     a.alphabet = ["1", "0"]

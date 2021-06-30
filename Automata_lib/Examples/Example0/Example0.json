@@ -5,7 +5,7 @@
 	"size_of_window": 3,
 	"name": "Clear automaton",
 	"type": "None",
-	"doc_string": "This is clear automaton",
+	"doc_string": "accept language { a^n b^n c | n >= 0 } union { a^n b^2n d | n >= 0}",
 	"instructions": {
 		"q0": {
 			"['a', 'a', 'a']": [ [ "q0", "MVR" ] ],

@@ -6,7 +6,6 @@ import re
 from typing import Type
 # from colorama import Fore, Back, Style, init
 from dataclasses import dataclass
-from xxlimited import Null
 
 # init(autoreset=True)
 
@@ -188,7 +187,7 @@ class BaseAutomaton:
         text_version = stat.text_version
         restarted = False
         accepted = False
-        to_state = Null
+        to_state = None
         rewrite_to = ""
         if type(right_side) is str:
             if right_side == "Restart":
@@ -214,13 +213,13 @@ class BaseAutomaton:
                 text_version = len(self.texts) - 1
         else:
             raise Exception("unexpected instruction")
-        if not accepted:
+        if accepted:
+            return True
+        else:
             new_conf = configuration(
                 state=to_state, position=position, text_version=text_version, end_of_cycle=restarted, father=stat, rewrite_to=str(rewrite_to), rewrite_from=self.texts[stat.text_version][position:end_position])
             self.configs.append(new_conf)
             return False
-        else:
-            return True
 
     def __move(self, window, conf: configuration):
         possible_windows = self.instructions[conf.state]
@@ -266,10 +265,10 @@ class BaseAutomaton:
                 self.log(3, config.stringify(
                     text, self.size_of_window, output=self.output_stream))
 
-    def dfs_search(self, configs):
+    def bfs_search(self, configs):
         pass
 
-    def bfs_search(self):
+    def dfs_search(self):
         while self.configs:
             conf = self.configs.pop()
             window = self.__get_window(
@@ -292,7 +291,7 @@ class BaseAutomaton:
             self.initial_state, 0, 0)
         self.configs = [starting_status]
         self.log(2, self.texts[0])
-        return self.bfs_search()
+        return self.dfs_search()
 
     def print_instructions(self):
         for state in self.instructions:
@@ -316,3 +315,16 @@ class BaseAutomaton:
                 if len(self.instructions[state][value]) > 1:
                     return False
         return True
+
+    def is_rrww(self):
+        for from_state in self.instructions.keys():
+            for window in self.instructions[from_state]:
+                pass
+
+    def can_restart(self, state):
+        s = [state]
+        visited = []
+        while s:
+            cur_state = s.pop()
+            visited.append(cur_state)
+            possible_states = [i for i in self.instructions[cur_state]]

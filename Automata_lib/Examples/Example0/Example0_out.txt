@@ -4,7 +4,7 @@ working_alphabet:
 size_of_window: 3
 name: Clear automaton
 type: None
-doc_string: This is clear automaton
+doc_string: accept language { a^n b^n c | n >= 0 } union { a^n b^2n d | n >= 0}
 q0 aaa -> q0 MVR
 q0 aab -> q0 MVR
 q0 abb -> q0 MVR
