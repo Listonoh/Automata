@@ -2,9 +2,9 @@ initial_state: q0
 alphabet: a, b, c, d, e
 working_alphabet: E, D
 size_of_window: 4
-name: non-monotonous
+name: monotonous
 type: None
-doc_string: accept language { a^n (cb)^n d | n >= 0 } union { a^2n (cb)^n e | n >= 0}
+doc_string: [Mon] accept language { a^n (cb)^n d | n >= 0 } union { a^2n (cb)^n e | n >= 0}
 q0 #d$ -> Accept
 q0 #e$ -> Accept
 q0 #aaa -> q0 MVR

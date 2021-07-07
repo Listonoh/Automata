@@ -1,4 +1,3 @@
-from dis import Instruction
 import enum
 import itertools
 import json
@@ -51,6 +50,7 @@ class configuration:
 
 
 class OutputMode(enum.Enum):
+    HELP = 4
     INSTRUCTIONS = 3
     CYCLES = 2
     RESULT = 1
@@ -59,12 +59,12 @@ class OutputMode(enum.Enum):
 class BaseAutomaton:
     initial_state = None
     size_of_window = 1
-    special_instructions = ["MVL", "MVR", "[]"]
-    detail_of_output = OutputMode.INSTRUCTIONS
-    configs = []
     alphabet = set()
     working_alphabet = set()
     special_symbols = "#$*"
+    configs = []
+    special_instructions = ["MVL", "MVR", "[]"]
+    detail_of_output = OutputMode.INSTRUCTIONS
     name = "Automaton"
     type = "RLWW"
     doc_string = ""
@@ -209,6 +209,7 @@ class BaseAutomaton:
                 new_list = self.texts[stat.text_version].copy()
                 rewrite_to = eval(instruction)  # making array from string
                 new_list[position:end_position] = rewrite_to  # rewriting
+                position += len(rewrite_to)
                 self.texts.append(new_list)
                 text_version = len(self.texts) - 1
         else:
@@ -227,10 +228,13 @@ class BaseAutomaton:
             for right_side in possible_windows["['*']"]:
                 if self.__do_instruction(right_side, conf):
                     return True
-        elif window in possible_windows.keys():
+        if window in possible_windows.keys():
             for right_side in possible_windows[window]:
                 if self.__do_instruction(right_side, conf):
                     return True
+        if window not in possible_windows.keys() and "['*']" not in possible_windows:
+            self.log(
+                4, f"failed configuration {window} - {conf.state}, {conf.position}")
         return False
 
     def __get_window(self, text: str, position: int):
