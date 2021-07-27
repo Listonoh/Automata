@@ -58,29 +58,29 @@ def test_from_text_to_text():
 def test_accepting_word():
     a = Automaton()
     a.load_text(txt_in)
-    assert a.evaluate("#aaabbbc$")
-    assert a.evaluate("#aaabbbbbbd$")
-    assert not a.evaluate("#aaabbbbb$")
+    assert a.evaluate("aaabbbc")
+    assert a.evaluate("aaabbbbbbd")
+    assert not a.evaluate("aaabbbbb")
 
 
 def test_0n1n():
     a = Automaton(example_folder + "0n1n.txt")
-    results = [a.evaluate("#000000111111$"),
-               not a.evaluate("#00000111111$"),
-               a.evaluate("#01$"),
-               a.evaluate("#0011$"),
-               not a.evaluate("#2000111$")]
+    results = [a.evaluate("000000111111"),
+               not a.evaluate("00000111111"),
+               a.evaluate("01"),
+               a.evaluate("0011"),
+               not a.evaluate("2000111")]
     assert sum(results) == 5
 
 
 def test_brackets():
     a = Automaton(example_folder + "balanced_brackets.txt")
-    results = [a.evaluate("#((()())())$"),
-               not a.evaluate("#())$"),
-               not a.evaluate("#(()$"),
-               a.evaluate("#()$"),
-               a.evaluate("#()(())$"),
-               not a.evaluate("#(2$")]
+    results = [a.evaluate("((()())())"),
+               not a.evaluate("())"),
+               not a.evaluate("(()"),
+               a.evaluate("()"),
+               a.evaluate("()(())"),
+               not a.evaluate("(2")]
     sum_results = sum(results)
     len_results = len(results)
     assert sum_results == len_results
@@ -88,12 +88,12 @@ def test_brackets():
 
 def test_ending_01():
     a = Automaton(example_folder + "ending01.txt")
-    results = [a.evaluate("#10001100101$"),
-               not a.evaluate("#0$"),
-               not a.evaluate("#$"),
-               a.evaluate("#0001$"),
-               a.evaluate("#001101$"),
-               not a.evaluate("#(2$")]
+    results = [a.evaluate("10001100101"),
+               not a.evaluate("0"),
+               not a.evaluate(""),
+               a.evaluate("0001"),
+               a.evaluate("001101"),
+               not a.evaluate("(2")]
     sum_results = sum(results)
     len_results = len(results)
     assert sum_results == len_results
@@ -101,12 +101,12 @@ def test_ending_01():
 
 def test_contain_01():
     a = Automaton(example_folder + "contain01.txt")
-    results = [a.evaluate("#10001100101$"),
-               not a.evaluate("#1111110000$"),
-               not a.evaluate("#$"),
-               a.evaluate("#0001$"),
-               a.evaluate("#001101$"),
-               not a.evaluate("#(2$")]
+    results = [a.evaluate("10001100101"),
+               not a.evaluate("1111110000"),
+               not a.evaluate(""),
+               a.evaluate("0001"),
+               a.evaluate("001101"),
+               not a.evaluate("(2")]
     sum_results = sum(results)
     len_results = len(results)
     assert sum_results == len_results
@@ -114,12 +114,12 @@ def test_contain_01():
 
 def test_example0_without_MVL():
     a = Automaton(example_folder + "example0_without_MVL.txt")
-    results = [a.evaluate("#abc$"),
-               not a.evaluate("#aaac$"),
-               not a.evaluate("#$"),
-               a.evaluate("#aabbbbd$"),
-               a.evaluate("#aaaabbbbbbbbd$"),
-               not a.evaluate("#(2$")]
+    results = [a.evaluate("abc"),
+               not a.evaluate("aaac"),
+               not a.evaluate(""),
+               a.evaluate("aabbbbd"),
+               a.evaluate("aaaabbbbbbbbd"),
+               not a.evaluate("(2")]
     sum_results = sum(results)
     len_results = len(results)
     assert sum_results == len_results

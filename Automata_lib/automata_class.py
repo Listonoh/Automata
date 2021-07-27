@@ -59,8 +59,8 @@ class OutputMode(enum.Enum):
 class BaseAutomaton:
     initial_state = None
     size_of_window = 1
-    alphabet = set()
-    working_alphabet = set()
+    alphabet = []
+    working_alphabet = []
     special_symbols = "#$*"
     configs = []
     special_instructions = ["MVL", "MVR", "[]"]
@@ -69,8 +69,9 @@ class BaseAutomaton:
     type = "RLWW"
     doc_string = ""
     instructions = {}
-    output_stream = False
+    output_stream = None
     logs = ""
+    texts = []
 
     def __init__(self, file=""):
         if file:
@@ -82,7 +83,7 @@ class BaseAutomaton:
     def log(self, importance, message, end="\n"):
         if self.detail_of_output.value >= importance:
             if self.output_stream:
-                print(message, end=end)
+                self.output_stream(message, end=end)
             self.logs += str(message) + end
 
     @property
@@ -119,7 +120,7 @@ class BaseAutomaton:
 
     def add_to_alphabet(self, *chars):
         for ch in chars:
-            self.alphabet.add(ch)
+            self.alphabet.append(ch)
 
     def add_accepting_state(self, *states):
         for state in states:
@@ -289,6 +290,7 @@ class BaseAutomaton:
         self.detail_of_output = detail_of_output
         self.output_stream = output_stream
 
+        word = "#" + word + "$"
         self.texts = [self.__parse_text_to_list(word)]
         self.paths_of_stats = [[0]]
         starting_status = configuration(

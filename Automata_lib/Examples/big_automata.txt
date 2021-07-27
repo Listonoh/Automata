@@ -1,0 +1,19 @@
+initial_state: q0
+alphabet: 0, 1
+working_alphabet: 
+size_of_window: 16
+name: 
+type: RLWW
+doc_string: This automaton 
+q0 #$ -> Accept
+q0 0000000000000000 -> q0 MVR
+q0 0000000000000001 -> q0 MVR
+q0 0000000000000011 -> q0 MVR
+q0 0000000000000111 -> q0 MVR
+q0 0000000000001111 -> q0 MVR
+q0 0000000000011111 -> q0 MVR
+q0 0000000000111111 -> q0 MVR
+q0 #001 -> q0 MVR
+q0 #000 -> q0 MVR
+q0 0011 -> qr 01
+qr * -> Restart

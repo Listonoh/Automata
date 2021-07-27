@@ -9,8 +9,9 @@ class Automaton(BaseAutomaton):
         if file:
             try:
                 self.load_text(file)
-            except (FileNotFoundError, FileExistsError):
+            except (FileNotFoundError):
                 self.log(2, "\nAutomaton can not be loaded")
+                print("file not found")
 
     def __load_key(self, key, rest_of_line):
         if key in ["alphabet", "working_alphabet"]:

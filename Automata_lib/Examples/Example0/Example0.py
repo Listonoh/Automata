@@ -4,7 +4,6 @@ from Automata_lib import Automaton, OutputMode
 
 a = Automaton(output=print, out_mode=OutputMode.INSTRUCTIONS)
 
-a.starting_position = 0
 a.size_of_window = 3
 a.initial_state = "q0"
 a.add_to_alphabet("a", "b", "c", "d")
