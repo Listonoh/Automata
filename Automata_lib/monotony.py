@@ -79,58 +79,69 @@ def is_monotonic(a: Automaton, silent=False):
 
 
 def to_digraph(a: Automaton):
-    possible_states = set(
-        ["Accept", "Restart"])
-    #  +
-    # [key + window
-    #  for key in a.instructions.keys()
-    #  for window in a.instructions[key]])
+    possible_states = set(["Accept", "Restart"])
     for key in a.instructions.keys():
         for window in a.instructions[key]:
             possible_states.add(key + window)  # beware of star
-    # possible_states = {key + window for key in a.instructions.keys() for window in a.instructions[key]}
-    # print(possible_states)
+
     possible_states = list(possible_states)
     digraph = defaultdict(list)
     rewrites = defaultdict(list)
-    for state in possible_states:
-        if "#" in state:
-            digraph["Initial"].append(state)
+
+    digraph["Initial"] = [state for state in possible_states if "#" in state]
+    extract_instructions(a, possible_states, digraph, rewrites)
+    return digraph, rewrites
+
+
+def extract_instructions(a, possible_states, digraph, rewrites):
     for key in a.instructions.keys():
         for window in a.instructions[key]:
             for instruction in a.instructions[key][window]:
-                if type(instruction) is str:
-                    digraph[key+window].append(instruction)
-                elif type(instruction) is list and len(instruction) == 2:
-                    to_state = instruction[0]
-                    instruction = instruction[1]
-                    if instruction == "MVR":
-                        for c in a.alphabet + a.working_alphabet + ["$"]:
-                            new_window = str(eval(window)[1:] + [c])
-                            if to_state+new_window in possible_states + [to_state+"['*']"]:
-                                digraph[key+window].append(to_state+new_window)
-                    elif instruction == "MVL":
-                        raise Exception("Not supported two-way automata")
-                    elif re.match(r"^\[.*\]$", instruction):
-                        # rewrite_to = [a.strip() for a in instruction[1:-1].split(",")]
-                        # making array from string
-                        rewrite_to = eval(instruction)
-                        # if to_state+"['*']" in possible_states:
-                        #     tt = to_state+"['*']"
-                        #     rewrites[key+window].append({"rewriten_to":rewrite_to,"to_state": tt})
-                        #     digraph[key+window].append(tt)
-                        if rewrite_to and rewrite_to[-1] == "$":
-                            if to_state+"['$']" in possible_states:
-                                digraph[key+window].append(to_state+"['$']")
-                                rewrites[key+window].append(
-                                    {"rewritten_to": rewrite_to, "to_state": to_state+"[]"})
-                        else:
-                            for possible_window in possible_states:  # get rid all that couldnt be after ie those with #
-                                if "#" not in possible_window and to_state == possible_window.split("[")[0]:
-                                    digraph[key+window].append(possible_window)
-                                    rewrites[key+window].append(
-                                        {"rewritten_to": rewrite_to, "to_state": possible_window})
-    return digraph, rewrites
+                extract_instruction(a, possible_states, key,
+                                    window, digraph, rewrites, instruction)
+
+
+def extract_instruction(a, possible_states, key, window, digraph, rewrites, instruction):
+    if type(instruction) is str:
+        digraph[key+window].append(instruction)
+    elif type(instruction) is list and len(instruction) == 2:
+        to_state = instruction[0]
+        instruction = instruction[1]
+        if instruction == "MVR":
+            extract_MVR(a, possible_states, key, window, digraph, to_state)
+        elif instruction == "MVL":
+            raise Exception("Not supported two-way automata")
+        elif re.match(r"^\[.*\]$", instruction):
+            extract_rewrite(possible_states, key, window,
+                            digraph, rewrites, instruction, to_state)
+
+
+def extract_rewrite(possible_states, key, window, digraph, rewrites, instruction, to_state):
+    # rewrite_to = [a.strip() for a in instruction[1:-1].split(",")]
+    # making array from string
+    rewrite_to = eval(instruction)
+    # if to_state+"['*']" in possible_states:
+    #     tt = to_state+"['*']"
+    #     rewrites[key+window].append({"rewriten_to":rewrite_to,"to_state": tt})
+    #     digraph[key+window].append(tt)
+    if rewrite_to and rewrite_to[-1] == "$":
+        if to_state+"['$']" in possible_states:
+            digraph[key+window].append(to_state+"['$']")
+            rewrites[key+window].append(
+                {"rewritten_to": rewrite_to, "to_state": to_state+"[]"})
+        else:
+            for possible_window in possible_states:  # get rid all that couldest be after ie those with #
+                if "#" not in possible_window and to_state == possible_window.split("[")[0]:
+                    digraph[key+window].append(possible_window)
+                    rewrites[key+window].append(
+                        {"rewritten_to": rewrite_to, "to_state": possible_window})
+
+
+def extract_MVR(a, possible_states, key, window, digraph, to_state):
+    for c in a.alphabet + a.working_alphabet + ["$"]:
+        new_window = str(eval(window)[1:] + [c])
+        if to_state+new_window in possible_states + [to_state+"['*']"]:
+            digraph[key+window].append(to_state+new_window)
 
 
 def from_digraph_to_dot(digraph: dict) -> Digraph:
