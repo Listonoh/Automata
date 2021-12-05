@@ -2,9 +2,24 @@ import enum
 import itertools
 import json
 import re
+import sys
 from typing import Type
 # from colorama import Fore, Back, Style, init
 from dataclasses import dataclass
+import logging
+
+
+# logging
+logger = logging.getLogger(__name__)
+output_file_handler = logging.FileHandler('automata.log')
+stdout_handler = logging.StreamHandler(sys.stdout)
+logger.setLevel(logging.DEBUG)
+logger.setFormatter(logging.Formatter(
+    '%(asctime)s:%(levelname)s:%(message)s'))
+
+logger.addHandler(output_file_handler)
+logger.addHandler(stdout_handler)
+
 
 # init(autoreset=True)
 
@@ -70,7 +85,6 @@ class BaseAutomaton:
     doc_string = ""
     instructions = {}
     output_stream = None
-    logs = ""
     texts = []
 
     def __init__(self, file=""):
@@ -78,7 +92,7 @@ class BaseAutomaton:
             try:
                 self.load_from_json_file(file)
             except (FileNotFoundError, FileExistsError):
-                self.log(2, "\nAutomaton can not be loaded")
+                logger.error(f"File {file} not found")
 
     def log(self, importance, message, end="\n"):
         if self.detail_of_output.value >= importance:
@@ -138,7 +152,6 @@ class BaseAutomaton:
         return return_arr
 
     def __initialize_instructions(self, from_state, content_of_window):
-
         if from_state not in self.instructions:
             self.instructions[from_state] = {content_of_window: []}
 
