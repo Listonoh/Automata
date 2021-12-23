@@ -1,4 +1,5 @@
-from Automata_lib import BaseAutomaton
+from automata_lib import BaseAutomaton
+
 
 class types:
     def rrww(automaton: BaseAutomaton):

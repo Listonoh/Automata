@@ -1,4 +1,4 @@
-from Automata_lib import Automaton, OutputMode
+from automata_lib import Automaton, OutputMode
 import re
 from graphviz import Digraph
 from itertools import permutations

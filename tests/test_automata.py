@@ -1,13 +1,12 @@
-# from automata import Automaton
-from Automata_lib import BaseAutomaton, Automaton
+from automata_lib import BaseAutomaton, Automaton
 import json
 import filecmp
-import sys
-txt_in = "Automata_lib/Examples/Example0/Example0.txt"
-json_out = "Automata_lib/Examples/Example0/Example0_out.json"
-json_in = "Automata_lib/Examples/Example0/Example0.json"
-txt_out = "Automata_lib/Examples/Example0/Example0_out.txt"
-example_folder = "Automata_lib/Examples/"
+example_folder = "Examples/"
+
+txt_in = f"{example_folder}Example0/Example0.txt"
+json_out = f"{example_folder}Example0/Example0_out.json"
+json_in = f"{example_folder}Example0/Example0.json"
+txt_out = f"{example_folder}Example0/Example0_out.txt"
 
 
 def __compare_json(file1, file2):

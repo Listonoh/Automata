@@ -1,4 +1,4 @@
-from Automata_lib import BaseAutomaton, OutputMode
+from automata_lib import BaseAutomaton, OutputMode
 
 
 class Automaton(BaseAutomaton):
@@ -27,9 +27,11 @@ class Automaton(BaseAutomaton):
         from_state, window = first_part.strip().split()
         right_side = right_side.split()
         if len(right_side) == 1:
-            self.add_one_instr(from_state, window, right_side[0])
+            self.add_instruction_without_state(
+                from_state, window, right_side[0])
         elif len(right_side) == 2:
-            self.add_instr(from_state, window, right_side[0], right_side[1])
+            self.add_instruction(from_state, window,
+                                 right_side[0], right_side[1])
 
     def __load_line(self, line: str):
         line = line.replace("\n", "")

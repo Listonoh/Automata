@@ -4,7 +4,6 @@ import json
 import re
 import sys
 from typing import Type
-# from colorama import Fore, Back, Style, init
 from dataclasses import dataclass
 import logging
 
@@ -14,7 +13,8 @@ logger = logging.getLogger(__name__)
 output_file_handler = logging.FileHandler('automata.log')
 stdout_handler = logging.StreamHandler(sys.stdout)
 logger.setLevel(logging.DEBUG)
-logger.setFormatter(logging.Formatter(
+logger
+output_file_handler.setFormatter(logging.Formatter(
     '%(asctime)s:%(levelname)s:%(message)s'))
 
 logger.addHandler(output_file_handler)
@@ -94,11 +94,11 @@ class BaseAutomaton:
             except (FileNotFoundError, FileExistsError):
                 logger.error(f"File {file} not found")
 
-    def log(self, importance, message, end="\n"):
+    def log(self, importance, message):
         if self.detail_of_output.value >= importance:
             if self.output_stream:
-                self.output_stream(message, end=end)
-            self.logs += str(message) + end
+                self.output_stream(message)
+            logger.info(message)
 
     @property
     def definition(self):
@@ -140,17 +140,6 @@ class BaseAutomaton:
         for state in states:
             self.accepting_states.add(state)
 
-    # TODO
-    def get_words_of_len(self, length=5, count=20):
-        return None
-        return_arr = []
-        for possibility in itertools.product(self.alphabet, length):
-            if True:
-                return_arr.append(possibility)
-            if len(return_arr) >= count:
-                return return_arr
-        return return_arr
-
     def __initialize_instructions(self, from_state, content_of_window):
         if from_state not in self.instructions:
             self.instructions[from_state] = {content_of_window: []}
@@ -168,7 +157,7 @@ class BaseAutomaton:
     def __check_used_symbols(self, word):
         return True
 
-    def add_instr(self, from_state: str, content_of_window, to_state: str, instruction: str):
+    def add_instruction(self, from_state: str, content_of_window, to_state: str, instruction: str):
         for window in self.substituted_dots_in_window(content_of_window):
             if not type(window) is list:
                 window = str(list(window))
@@ -178,7 +167,7 @@ class BaseAutomaton:
             self.instructions[from_state][window].append(
                 [to_state, instruction])
 
-    def add_one_instr(
+    def add_instruction_without_state(
             self, from_state: str, content_of_window, instruction) -> bool:
         """
         Does not rewrite if exist, see replace_instruction
@@ -299,8 +288,8 @@ class BaseAutomaton:
                 return True
         return False
 
-    def evaluate(self, word, detail_of_output=OutputMode.INSTRUCTIONS, output_stream=print) -> bool:
-        self.detail_of_output = detail_of_output
+    def evaluate(self, word, detail_of_output=logging.DEBUG, output_stream=print) -> bool:
+        logger.setLevel(detail_of_output)
         self.output_stream = output_stream
 
         word = "#" + word + "$"
