@@ -1,4 +1,4 @@
-from src.restarting_automata import BaseAutomaton, Automaton
+from restarting_automata import BaseAutomaton, Automaton
 import json
 import filecmp
 
