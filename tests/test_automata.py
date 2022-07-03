@@ -1,4 +1,4 @@
-from automata_lib import BaseAutomaton, Automaton
+from src.restarting_automata import BaseAutomaton, Automaton
 import json
 import filecmp
 example_folder = "Examples/"

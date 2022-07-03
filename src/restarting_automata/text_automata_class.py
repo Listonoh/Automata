@@ -1,4 +1,4 @@
-from automata_lib import BaseAutomaton, OutputMode
+from .automata_class import BaseAutomaton, OutputMode
 
 
 class Automaton(BaseAutomaton):
@@ -15,8 +15,13 @@ class Automaton(BaseAutomaton):
 
     def __load_key(self, key, rest_of_line):
         if key in ["alphabet", "working_alphabet"]:
-            setattr(self, key, [] if rest_of_line == "" else [i.strip()
-                                                              for i in rest_of_line.split(",")])
+            setattr(
+                self,
+                key,
+                []
+                if rest_of_line == ""
+                else [i.strip() for i in rest_of_line.split(",")],
+            )
         elif key == "size_of_window":
             self.size_of_window = int(rest_of_line)
         else:
@@ -27,11 +32,9 @@ class Automaton(BaseAutomaton):
         from_state, window = first_part.strip().split()
         right_side = right_side.split()
         if len(right_side) == 1:
-            self.add_instruction_without_state(
-                from_state, window, right_side[0])
+            self.add_instruction_without_state(from_state, window, right_side[0])
         elif len(right_side) == 2:
-            self.add_instruction(from_state, window,
-                                 right_side[0], right_side[1])
+            self.add_instruction(from_state, window, right_side[0], right_side[1])
 
     def __load_line(self, line: str):
         line = line.replace("\n", "")
@@ -40,7 +43,7 @@ class Automaton(BaseAutomaton):
 
         if key in self.definition.keys():
             # parsed line pherhaps
-            rest_of_line = line[len(parsed_line[0]) + 1:].lstrip()
+            rest_of_line = line[len(parsed_line[0]) + 1 :].lstrip()
             self.__load_key(key, rest_of_line)
         else:
             self.__load_instruction(line)
@@ -67,14 +70,14 @@ class Automaton(BaseAutomaton):
                         instruction = right_side[1]
                         if instruction not in self.special_instructions:
                             instruction = "".join(eval(right_side[1]))
-                        return_value.append("{} {} -> {} {}".format(
-                            state, sting_window, right_side[0], instruction
-                        )
+                        return_value.append(
+                            "{} {} -> {} {}".format(
+                                state, sting_window, right_side[0], instruction
+                            )
                         )
                     elif type(right_side) is str:
-                        return_value.append("{} {} -> {}".format(
-                            state, sting_window, right_side
-                        )
+                        return_value.append(
+                            "{} {} -> {}".format(state, sting_window, right_side)
                         )
 
         return "\n".join(return_value)
@@ -92,6 +95,5 @@ class Automaton(BaseAutomaton):
         self.alphabet = sorted(self.alphabet)
         with open(file, "w") as out_file:
             for key, value in self.definition.items():
-                out_file.write(
-                    self.__stringify_line_for_save(key, value) + "\n")
+                out_file.write(self.__stringify_line_for_save(key, value) + "\n")
             out_file.close()

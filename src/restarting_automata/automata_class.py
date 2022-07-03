@@ -1,5 +1,4 @@
 import enum
-import itertools
 import json
 import re
 import sys
@@ -10,12 +9,13 @@ import logging
 
 # logging
 logger = logging.getLogger(__name__)
-output_file_handler = logging.FileHandler('automata.log')
+output_file_handler = logging.FileHandler("automata.log")
 stdout_handler = logging.StreamHandler(sys.stdout)
 logger.setLevel(logging.DEBUG)
-logger
-output_file_handler.setFormatter(logging.Formatter(
-    '%(asctime)s:%(levelname)s:%(message)s'))
+
+output_file_handler.setFormatter(
+    logging.Formatter("%(asctime)s:%(levelname)s:%(message)s")
+)
 
 logger.addHandler(output_file_handler)
 logger.addHandler(stdout_handler)
@@ -51,11 +51,13 @@ class configuration:
 
         list_of_text = [i for i in text]
         start_bold = self.position
-        end_bold = min(self.position + size_of_window-1, len(list_of_text) - 1)
-        list_of_text[start_bold] = self.highlight[type_of_highlight.value][0] + \
-            list_of_text[start_bold]
-        list_of_text[end_bold] = list_of_text[end_bold] + \
-            self.highlight[type_of_highlight.value][1]
+        end_bold = min(self.position + size_of_window - 1, len(list_of_text) - 1)
+        list_of_text[start_bold] = (
+            self.highlight[type_of_highlight.value][0] + list_of_text[start_bold]
+        )
+        list_of_text[end_bold] = (
+            list_of_text[end_bold] + self.highlight[type_of_highlight.value][1]
+        )
 
         rewritten = ""
         if self.rewrite_to:
@@ -150,25 +152,26 @@ class BaseAutomaton:
     def substituted_dots_in_window(self, window):
         r = [window]
         while any(["." in w for w in r]):
-            r = [word.replace(".", symbol, 1)
-                 for symbol in self.alphabet for word in r]
+            r = [word.replace(".", symbol, 1) for symbol in self.alphabet for word in r]
         return r
 
     def __check_used_symbols(self, word):
         return True
 
-    def add_instruction(self, from_state: str, content_of_window, to_state: str, instruction: str):
+    def add_instruction(
+        self, from_state: str, content_of_window, to_state: str, instruction: str
+    ):
         for window in self.substituted_dots_in_window(content_of_window):
             if not type(window) is list:
                 window = str(list(window))
             self.__initialize_instructions(from_state, window)
             if instruction not in self.special_instructions:
                 instruction = str(self.__parse_text_to_list(instruction))
-            self.instructions[from_state][window].append(
-                [to_state, instruction])
+            self.instructions[from_state][window].append([to_state, instruction])
 
     def add_instruction_without_state(
-            self, from_state: str, content_of_window, instruction) -> bool:
+        self, from_state: str, content_of_window, instruction
+    ) -> bool:
         """
         Does not rewrite if exist, see replace_instruction
         modify delta[from_state, value] -> [to_state, instruction] | Accept | Restart
@@ -178,8 +181,7 @@ class BaseAutomaton:
             if not type(window) is list:
                 window = str(list(window))
             self.__initialize_instructions(from_state, window)
-            self.instructions[from_state][window].append(
-                instruction)
+            self.instructions[from_state][window].append(instruction)
 
     # def replace_instructions(self, from_state, value, to_state, instruction):
     #     self.instructions[from_state][value] = [[to_state, instruction]]
@@ -221,7 +223,14 @@ class BaseAutomaton:
             return True
         else:
             new_conf = configuration(
-                state=to_state, position=position, text_version=text_version, end_of_cycle=restarted, father=stat, rewrite_to=str(rewrite_to), rewrite_from=self.texts[stat.text_version][position:end_position])
+                state=to_state,
+                position=position,
+                text_version=text_version,
+                end_of_cycle=restarted,
+                father=stat,
+                rewrite_to=str(rewrite_to),
+                rewrite_from=self.texts[stat.text_version][position:end_position],
+            )
             self.configs.append(new_conf)
             return False
 
@@ -237,7 +246,8 @@ class BaseAutomaton:
                     return True
         if window not in possible_windows.keys() and "['*']" not in possible_windows:
             self.log(
-                4, f"failed configuration {window} - {conf.state}, {conf.position}")
+                4, f"failed configuration {window} - {conf.state}, {conf.position}"
+            )
         return False
 
     def __get_window(self, text: str, position: int):
@@ -266,11 +276,19 @@ class BaseAutomaton:
             self.pretty_printer(config.father)
             text = self.texts[config.text_version]
             if config.end_of_cycle:
-                self.log(2, config.stringify(
-                    text, self.size_of_window, output=self.output_stream))
+                self.log(
+                    2,
+                    config.stringify(
+                        text, self.size_of_window, output=self.output_stream
+                    ),
+                )
             else:
-                self.log(3, config.stringify(
-                    text, self.size_of_window, output=self.output_stream))
+                self.log(
+                    3,
+                    config.stringify(
+                        text, self.size_of_window, output=self.output_stream
+                    ),
+                )
 
     def bfs_search(self, configs):
         pass
@@ -278,25 +296,24 @@ class BaseAutomaton:
     def dfs_search(self):
         while self.configs:
             conf = self.configs.pop()
-            window = self.__get_window(
-                self.texts[conf.text_version], conf.position)
+            window = self.__get_window(self.texts[conf.text_version], conf.position)
             if self.__move(window, conf):
                 self.log(2, f"remaining tuples = {self.configs}")
-                self.log(
-                    2, f"number of copies of text = {len(self.texts)}")
+                self.log(2, f"number of copies of text = {len(self.texts)}")
                 self.pretty_printer(conf)
                 return True
         return False
 
-    def evaluate(self, word, detail_of_output=logging.DEBUG, output_stream=print) -> bool:
+    def evaluate(
+        self, word, detail_of_output=logging.DEBUG, output_stream=print
+    ) -> bool:
         logger.setLevel(detail_of_output)
         self.output_stream = output_stream
 
         word = "#" + word + "$"
         self.texts = [self.__parse_text_to_list(word)]
         self.paths_of_stats = [[0]]
-        starting_status = configuration(
-            self.initial_state, 0, 0)
+        starting_status = configuration(self.initial_state, 0, 0)
         self.configs = [starting_status]
         self.log(2, self.texts[0])
         return self.dfs_search()

@@ -1,4 +1,4 @@
-from automata_lib import BaseAutomaton
+from .automata_class import BaseAutomaton
 
 
 class types:
