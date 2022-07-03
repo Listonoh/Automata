@@ -12,3 +12,5 @@ Dokumentace/rProjekt.synctex.gz
 *.pyc
 *.sqlite3
 *.swp
+.envs
+dist/*

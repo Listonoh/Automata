@@ -1,0 +1,23 @@
+initial_state: q0
+alphabet: a, b, c, d, e
+working_alphabet: E, D
+size_of_window: 3
+name: non-monotonous
+type: None
+doc_string: [NMon] accept language { a^n (cb)^n d | n >= 0 } union { a^2n (cb)^n e | n >= 0}
+q0 #$ -> Accept
+q0 aaa -> q0 MVR
+q0 aac -> q0 MVR
+q0 acb -> q0 MVR
+q0 cbc -> q0 MVR
+q0 bcb -> q0 MVR
+q0 #ac -> q0 MVR
+q0 #aa -> q0 MVR
+q0 cbe -> qr E
+q0 cbE -> qr EE
+q0 aaE -> qr []
+q0 cbd -> qr D
+q0 cbD -> qr DD
+q0 aaD -> qr a
+q0 #aD -> qr #
+qr * -> Restart

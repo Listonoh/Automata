@@ -1,0 +1,10 @@
+initial_state: q0
+alphabet: 0, 1
+working_alphabet: 
+size_of_window: 3
+name: [01]*01
+type: RLWW
+doc_string: [Mon] This automaton accept word that ends with 01
+q0 01$ -> Accept
+q0 ... -> q0 MVR
+q0 #.. -> q0 MVR

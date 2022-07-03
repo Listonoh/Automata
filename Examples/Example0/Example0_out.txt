@@ -1,0 +1,28 @@
+initial_state: q0
+alphabet: a, b, c, d
+working_alphabet: 
+size_of_window: 3
+name: Clear automaton
+type: None
+doc_string: accept language { a^n b^n c | n >= 0 } union { a^n b^2n d | n >= 0}
+q0 aaa -> q0 MVR
+q0 aab -> q0 MVR
+q0 abb -> q0 MVR
+q0 abc -> q0 MVR
+q0 bbb -> q0 MVR
+q0 bbc -> q0 MVR
+q0 bbd -> q0 MVR
+q0 #c$ -> Accept
+q0 #d$ -> Accept
+q0 #ab -> q0 MVR
+q0 #aa -> q0 MVR
+q0 bc$ -> qc MVL
+q0 bd$ -> qd MVL
+qr * -> Restart
+qc abc -> qr c
+qc bbc -> qc MVL
+qc bbb -> qc MVL
+qc abb -> qr b
+qd bbd -> qd MVL
+qd bbb -> qd MVL
+qd abb -> qr []

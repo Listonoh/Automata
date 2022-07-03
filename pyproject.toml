@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+
+[project]
+name = "restarting_automata"
+version = "0.1.0"
+author = "Jan Urban"
+author_email = "LeeStackCZ@gmail.com"
+description = "A small package for Restarting automata"
+classifiers = [
+	"Programming Language :: Python :: 3",
+	"License :: OSI Approved :: MIT License",
+	"Operating System :: OS Independent"
+    ]
+readme = "README.md"
+requires-python = ">=3.8"
+dependencies = ["graphviz", "colorama"]
+
+[project.urls]
+"Homepage" = "https://github.com/listonoh/automata_lib"
+"Bug Tracker" = "https://github.com/listonoh/automata_lib/issues"

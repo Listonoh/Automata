@@ -1,0 +1,40 @@
+{
+	"initial_state": "q0",
+	"alphabet": [ "a", "b", "c", "d" ],
+	"working_alphabet": [],
+	"size_of_window": 3,
+	"name": "Clear automaton",
+	"type": "None",
+	"doc_string": "accept language { a^n b^n c | n >= 0 } union { a^n b^2n d | n >= 0}",
+	"instructions": {
+		"q0": {
+			"['a', 'a', 'a']": [ [ "q0", "MVR" ] ],
+			"['a', 'a', 'b']": [ [ "q0", "MVR" ] ],
+			"['a', 'b', 'b']": [ [ "q0", "MVR" ] ],
+			"['a', 'b', 'c']": [ [ "q0", "MVR" ] ],
+			"['b', 'b', 'b']": [ [ "q0", "MVR" ] ],
+			"['b', 'b', 'c']": [ [ "q0", "MVR" ] ],
+			"['b', 'b', 'd']": [ [ "q0", "MVR" ] ],
+			"['#', 'c', '$']": [ "Accept" ],
+			"['#', 'd', '$']": [ "Accept" ],
+			"['#', 'a', 'b']": [ [ "q0", "MVR" ] ],
+			"['#', 'a', 'a']": [ [ "q0", "MVR" ] ],
+			"['b', 'c', '$']": [ [ "qc", "MVL" ] ],
+			"['b', 'd', '$']": [ [ "qd", "MVL" ] ]
+		},
+		"qr": {
+			"['*']": [ "Restart" ]
+		},
+		"qc": {
+			"['a', 'b', 'c']": [ [ "qr", "['c']" ] ],
+			"['b', 'b', 'c']": [ [ "qc", "MVL" ] ],
+			"['b', 'b', 'b']": [ [ "qc", "MVL" ] ],
+			"['a', 'b', 'b']": [ [ "qr", "['b']" ] ]
+		},
+		"qd": {
+			"['b', 'b', 'd']": [ [ "qd", "MVL" ] ],
+			"['b', 'b', 'b']": [ [ "qd", "MVL" ] ],
+			"['a', 'b', 'b']": [ [ "qr", "[]" ] ]
+		}
+	}
+}

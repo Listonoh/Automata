@@ -6,12 +6,13 @@ nice end 1.7.
 1.6. 
 8.6. 
 15.6. functional library
-    [] constrains for evaluation
+    [] constrains for evaluation RRWW RWW .. 
     [] check input symbols and symbols in instructions
-    [] 8+ more examples
+    [] 8+ more  
     [] test for constrains
-    [] advanced function
-    [] test for advanced function
+    [] add rewrite to [] -> ["$"]
+    [x] advanced function / monotonie
+    [x] test for advanced function
     [x] output with states and instructions
 22.6. analysis + design
     [] extending
@@ -29,3 +30,11 @@ nice end 1.7.
 13. final version
 20
 22.7.
+
+
+monotonie do hlavniho souboru
+typy
+testy
+celej web
+stress test
+user guide
