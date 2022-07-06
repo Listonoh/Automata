@@ -1,4 +1,6 @@
-from typing import Generator, List
+import ast
+
+from typing import Dict, Generator, Iterable, List, Set, Tuple, Union
 from .automata_class import OutputMode
 from .text_automata_class import Automaton
 import re
@@ -7,8 +9,10 @@ from itertools import permutations
 from collections import defaultdict
 
 
-def is_monotonic(a: Automaton, silent=False):
-    digraph, rewrites = to_digraph(a)
+def is_monotonic(a: Automaton, silent=False) -> bool:
+    digraph = to_digraph(a)
+    # rewrites = get_rewrites(a)
+    rewrites = {}
     to_check = []
     for i in rewrites.keys():
         to_check.append(i)
@@ -23,93 +27,108 @@ def is_monotonic(a: Automaton, silent=False):
     return True
 
 
-def to_digraph(a: Automaton):
+def to_digraph(a: Automaton) -> Dict[str, List[str]]:
     """
-    Takes automaton and returns his digraph 
+    Takes automaton and returns his digraph
+    in form of dict[str, List[str]]:
+    {
+        "state[window]": [state[window0], state[window1]],
+        ...
+    }
     """
-    possible_states = set(["Accept", "Restart"]) # set of special instructions that could be in automaton as state
-    for key in a.instructions.keys():
-        for window in a.instructions[key]:
-            possible_states.add(key + window)  # beware of star
+    possible_states = set(
+        ["Accept", "Restart"]
+    )  # set of special instructions that could be in automaton as state
 
-    possible_states = list(possible_states)
+    for key, windows in a.instructions.items():
+        for current_window in windows.keys():
+            possible_states.add(key + current_window)
+
+    possible_states = possible_states
     digraph = defaultdict(list)
     rewrites = defaultdict(list)
 
-    digraph["Initial"] = [state for state in possible_states if "#" in state]
-    extract_instructions(a, possible_states, digraph, rewrites)
-    return digraph, rewrites
+    digraph["Initial"] = [("", state) for state in possible_states if "#" in state]
 
-
-def extract_instructions(a, possible_states, digraph, rewrites):
-    for key in a.instructions.keys():
-        for window in a.instructions[key]:
-            for instruction in a.instructions[key][window]:
-                extract_instruction(
-                    a, possible_states, key, window, digraph, rewrites, instruction
+    for state, transition_function in a.instructions.items():
+        for from_window, instructions in transition_function.items():
+            for instruction in instructions:
+                valid_extensions = get_valid_extensions(
+                    a, possible_states, from_window, instruction
                 )
+                current_state = state + from_window
+                digraph[current_state] += valid_extensions
+
+    return digraph
 
 
-def extract_instruction(
-    a, possible_states, key, window, digraph, rewrites, instruction
+def get_valid_extensions(
+    a: Automaton,
+    possible_states: Set[str],
+    from_window: str,
+    instruction: Union[str, Tuple[str, str]],
 ):
     if type(instruction) is str:
-        digraph[key + window].append(instruction)
-    elif type(instruction) is list and len(instruction) == 2:
+        return [("", instruction)]
+    if type(instruction) is list and len(instruction) == 2:
         to_state = instruction[0]
         instruction = instruction[1]
         if instruction == "MVR":
-            extract_MVR(a, possible_states, key, window, digraph, to_state)
+            rt = [
+                (symbol, to_state + next_window)
+                for symbol, next_window in get_next_window(a, from_window)
+                if to_state + next_window in possible_states
+            ]
+            if to_state + "['*']" in possible_states:
+                rt.append(("*", to_state + "['*']"))
+            return rt
         elif instruction == "MVL":
             raise Exception("Not supported two-way automata")
         elif re.match(r"^\[.*\]$", instruction):
-            extract_rewrite(
-                possible_states, key, window, digraph, rewrites, instruction, to_state
-            )
+            return get_rewrite_windows(instruction, to_state, possible_states)
 
 
-def extract_rewrite(
-    possible_states, key, window, digraph, rewrites, instruction, to_state
-):
-    # rewrite_to = [a.strip() for a in instruction[1:-1].split(",")]
-    # making array from string
-    rewrite_to = eval(instruction)
-    # if to_state+"['*']" in possible_states:
-    #     tt = to_state+"['*']"
-    #     rewrites[key+window].append({"rewriten_to":rewrite_to,"to_state": tt})
-    #     digraph[key+window].append(tt)
-    if rewrite_to and rewrite_to[-1] == "$":
-        if to_state + "['$']" in possible_states:
-            digraph[key + window].append(to_state + "['$']")
-            rewrites[key + window].append(
-                {"rewritten_to": rewrite_to, "to_state": to_state + "[]"}
-            )
-        else:
-            for (
-                possible_window
-            ) in possible_states:  # get rid of all that couldest be after ie those with #
-                if (
-                    "#" not in possible_window
-                    and to_state == possible_window.split("[")[0]
-                ):
-                    digraph[key + window].append(possible_window)
-                    rewrites[key + window].append(
-                        {"rewritten_to": rewrite_to, "to_state": possible_window}
-                    )
+def get_next_window(a: Automaton, from_window: str) -> List[Tuple[str, str]]:
+    window = ast.literal_eval(from_window)[1:]
+    possible_symbols = a.alphabet + a.working_alphabet
+    result = []
+
+    if window[-1] == "$":
+        result.append(("", str(window)))
+    else:
+        possible_symbols + ["$"]
+
+    for c in possible_symbols:
+        result.append((c, str(window + [c])))
+    return result
 
 
-def extract_MVR(a, possible_states, key, window, digraph, to_state):
-    for c in a.alphabet + a.working_alphabet + ["$"]:
-        new_window = str(eval(window)[1:] + [c])
-        if to_state + new_window in possible_states + [to_state + "['*']"]:
-            digraph[key + window].append(to_state + new_window)
+def get_rewrite_windows(
+    instruction: str, to_state: str, possible_states: Set[str]
+) -> List[Tuple[str, str]]:
+    """
+    Takes part of the window + next state and go through all possible states if some matches.
+    This should give us only O(n^2) where n is number of rewrite instructions
+    """
+    window = ast.literal_eval(instruction)
+
+    incomplete_next_window = to_state + str(window)[:-1]
+    # gets all possible_states that has prefix of incomplete_next_window
+    result = [
+        ("", possible_state)
+        for possible_state in possible_states
+        if incomplete_next_window in possible_state
+    ]
+    if to_state + "['*']" in possible_states:
+        result.append(("*", to_state + "['*']"))
+    return result
 
 
 def from_digraph_to_dot(digraph: dict) -> Digraph:
     dot = Digraph()
     for from_state in digraph.keys():
-        for to_state in digraph[from_state]:
-            dot.edge(from_state, to_state)
+        for label, to_state in digraph[from_state]:
+            dot.edge(from_state, to_state, label)
     return dot
 
 

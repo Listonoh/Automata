@@ -29,5 +29,37 @@ With this all states should be present in graph at most only once, the unaccessi
 Each edge corresponds to one symbol so if there is vertex with rewrite then if we go backwards by edges and then forward by edges that corresponds to rewrite we should end up in states (there can be more than one edge with same symbol to one vertex) from where there is path to any rewrite iff the automaton is monotonous.
 
 2. digraph algorithm 
-There are many ways how to create digraph from automata, I have chosen DFS for this. 
-The data are stored in simple dictionary, that can be transcribed to dot format () which can be easily visualized.    
+For creation of digraph I use simple algorithm that iter through all instructions and take all possible states that are included in definition of automata.
+Let call them `possible states`, then I iter again and try to find next state from each state but i will discard all that are not included in the `possible states`.
+With this i create dictionary with keys as `possible states` and values next states from those and the edge needed.
+
+Bit problem is there with the `*` symbol that needs to have separated cases.
+
+With created digraph we can follow with the algorithm for monotonicity of automata
+
+The data are stored in simple dictionary, that can be transcribed to dot format () which can be easily visualized.   
+
+3.
+Let collect all states in which there is rewrite as `rewrite states`.
+Lets give the vertexes in digraph values depending on how far are they from rewrite.
+So for rewrites it is 0 and for others it is by default -1.
+For each vertex that has 0 lets go backwards to change all vertexes values to 1 if their value is -1.
+Lets repeat this with BFS algorithm (or DFS not yet implemented) and always increase value by one.
+When there is no more vertex that has rewrite as successor we go for next step.
+for each vertex with value 0 we trace back by the edges that corresponds to the rewritten window.
+then follow the edges forward by the rewrite, from definition we know that rewrites can be only rewritten to smaller word.
+If there is any state (there can be multiple forks on the road back and forward, and some can have death end) with positive value then the automaton is not monotonous.
+
+
+4. proof (kind of...)
+Let have automaton A with definition ... , then there exists only one representation of given automaton as digraph with vertexes as combination of states and possible windows.
+with edges as symbols that are used in transition from one state+window to another, the symbol is there only for MVR instruction for others instructions the symbol is empty.
+# why there is only one such digraph?
+then the digraph corresponds to ... and from the digraph there can be created words that are accepted by automaton A with endings in Accepting state. 
+# wrong wording I do not know how it is called in literature and what exactly are the properties of such graph.
+lets discard all vertexes that are not ending in Restart or Accept state.
+
+if we trace the rewritten window back and forward we get state that is accessible from the initial state and the distance from the left sentinel is still lower then the rewrite.
+then if there is rewrite further then difference between length of difference rewrite and rewritten window then the automaton can rewrite further from the left sentinel then the last rewrite,
+ as such the automaton is not monotonous.
+If there does not exist such case then the automaton is monotonous.
