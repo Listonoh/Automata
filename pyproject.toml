@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "restarting_automata"
-version = "0.1.0"
+version = "0.1.1"
 author = "Jan Urban"
 author_email = "LeeStackCZ@gmail.com"
 description = "A small package for Restarting automata"
