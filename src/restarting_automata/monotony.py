@@ -24,7 +24,10 @@ def is_monotonic(a: Automaton, silent=False):
 
 
 def to_digraph(a: Automaton):
-    possible_states = set(["Accept", "Restart"])
+    """
+    Takes automaton and returns his digraph 
+    """
+    possible_states = set(["Accept", "Restart"]) # set of special instructions that could be in automaton as state
     for key in a.instructions.keys():
         for window in a.instructions[key]:
             possible_states.add(key + window)  # beware of star
@@ -84,7 +87,7 @@ def extract_rewrite(
         else:
             for (
                 possible_window
-            ) in possible_states:  # get rid all that couldest be after ie those with #
+            ) in possible_states:  # get rid of all that couldest be after ie those with #
                 if (
                     "#" not in possible_window
                     and to_state == possible_window.split("[")[0]

@@ -1,0 +1,33 @@
+definition:
+let have RRWW automaton [] A then A is monotonous iff for all acceptable words there are not 2 successive cycles with rewrite where the position of rewrite from the left sentinel is greater then in the previous cycle.
+
+Proof from jancar99:
+In the paper he used set of words created from alphabet V of sufficient length such that all instructions would be used at least once. 
+That has large downfall for anyone who would like to program such proof as algorithm, because of the exponential growth of possible words up to acceptable length. 
+
+
+My attempts on the algorithm:
+1.
+From definition of automaton I can easily get the places where rewrite ocure.
+So let spit the problem to 2 scenarios, 2 successive rewrites not overlapping and 2 that overlaps.
+
+
+Let such states define as "RS", then for each RS i can get to what word it is rewritten let it denote as "w".
+If we split w = 'uv' where |u| > 0 and |v| > 0, then we just need to find all rewrites that starts with 'v'.
+That is wrong, because it could have ended (as rewrite or in accept state) before it even reach this rewrite point.   
+
+For that there is easy fix let just find if there exists some rewrite that ends with 'u'. 
+The 'u' and 'v' are not set so we have to find all that ends with prefix of w.
+This can get huge too but it should work except it does not.
+The problem is same as the last iteration, ... 
+
+So let view the problem from different angle from graphs perspective.
+Let has directed graph such that has start in starting state with all states that has left sentinel.
+And lets add edges for each state that has instruction move right for each symbol in alphabets if there exist such state with given state. 
+And repeat for each new vertex created, if there has to be created already created vertex just add the edge to the already created.
+With this all states should be present in graph at most only once, the unaccessible states are not included.
+Each edge corresponds to one symbol so if there is vertex with rewrite then if we go backwards by edges and then forward by edges that corresponds to rewrite we should end up in states (there can be more than one edge with same symbol to one vertex) from where there is path to any rewrite iff the automaton is monotonous.
+
+2. digraph algorithm 
+There are many ways how to create digraph from automata, I have chosen DFS for this. 
+The data are stored in simple dictionary, that can be transcribed to dot format () which can be easily visualized.    
