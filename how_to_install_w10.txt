@@ -1,0 +1,14 @@
+install python3 and pip
+go to this folder 
+
+# create venv
+pip -m venv .venv
+
+# activate venv 
+./.venv/Scripts/Activate.ps1
+
+# install dependancies and automata library
+pip install -r requirements.txt
+pip install .
+
+https://graphviz.org/download/
