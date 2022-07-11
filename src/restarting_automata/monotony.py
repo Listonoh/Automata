@@ -59,6 +59,19 @@ def to_digraph(a: Automaton) -> Dict[str, List[str]]:
                 current_state = state + from_window
                 digraph[current_state] += valid_extensions
 
+    # edges from star
+    for state, transition_function in a.instructions.items():
+        for from_window, instructions in transition_function.items():
+            if "*" in from_window:
+                for instruction in instructions:
+                    for configuration in possible_states:
+                        if state == configuration[: len(state)]:
+                            from_window = configuration[len(state) :]
+                            valid_extensions = get_valid_extensions(
+                                a, possible_states, from_window, instruction
+                            )
+                            digraph[configuration] += valid_extensions
+
     return digraph
 
 
@@ -74,14 +87,16 @@ def get_valid_extensions(
         to_state = instruction[0]
         instruction = instruction[1]
         if instruction == "MVR":
-            rt = [
-                (symbol, to_state + next_window)
-                for symbol, next_window in get_next_window(a, from_window)
-                if to_state + next_window in possible_states
-            ]
-            if to_state + "['*']" in possible_states:
-                rt.append(("*", to_state + "['*']"))
+            rt = []
+            for symbol, next_window in get_next_window(a, from_window):
+                if to_state + "['*']" in possible_states:
+                    rt.append((symbol, to_state + next_window))
+                    possible_states.add(to_state + next_window)
+
+                elif to_state + next_window in possible_states:
+                    rt.append((symbol, to_state + next_window))
             return rt
+
         elif instruction == "MVL":
             raise Exception("Not supported two-way automata")
         elif re.match(r"^\[.*\]$", instruction):
@@ -91,7 +106,7 @@ def get_valid_extensions(
 def get_next_window(a: Automaton, from_window: str) -> List[Tuple[str, str]]:
     """Takes automaton and window which may contain symbols or star and returns list of Edges"""
     if from_window == "['*']":
-        """ This is problematic becouse we don not know what symbols could be in window"""
+        """This is problematic becouse we don not know what symbols could be in window"""
         return []
     window = ast.literal_eval(from_window)[1:]
     possible_symbols = a.alphabet + a.working_alphabet
@@ -100,7 +115,7 @@ def get_next_window(a: Automaton, from_window: str) -> List[Tuple[str, str]]:
     if window[-1] == "$":
         result.append(("", str(window)))
     else:
-        possible_symbols + ["$"]
+        possible_symbols += ["$"]
 
     for c in possible_symbols:
         result.append((c, str(window + [c])))
@@ -123,8 +138,8 @@ def get_rewrite_windows(
         for possible_state in possible_states
         if incomplete_next_window in possible_state
     ]
-    if to_state + "['*']" in possible_states:
-        result.append(("*", to_state + "['*']"))
+    # if to_state + "['*']" in possible_states:
+    #     result.append(("*", to_state + "['*']"))
     return result
 
 

@@ -1,0 +1,16 @@
+initial_state: s0
+alphabet: a, b
+working_alphabet: 
+size_of_window: 3
+name: "a" on odd positions with odd length union even number of "b"
+type: RLWW
+doc_string: This automaton 
+s0 #a. -> s1 MVR
+s1 * -> s0 MVR
+s0 a.a -> s1 MVR 
+s1 .a$ -> Accept 
+s0 #a$ -> Accept
+s0 #bb -> s2 MVR
+s2 bbb -> s0 MVR
+s0 bbb -> s2 MVR
+s2 bb$ -> Accept
