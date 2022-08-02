@@ -18,15 +18,11 @@ output_file_handler.setFormatter(
 )
 
 logger.addHandler(output_file_handler)
-logger.addHandler(stdout_handler)
-
-
-# init(autoreset=True)
 
 
 class highlight_types(enum.Enum):
-    web = "web"
-    text = "text"
+    WEB = "web"
+    TEXT = "text"
 
 
 @dataclass
@@ -38,32 +34,32 @@ class configuration:
     rewrite_from: str = ""
     end_of_cycle: bool = False
     father: Type["configuration"] = None
-    highlight = {"web": ["<b>", "</b>"], "text": ["(", ")"]}
+    highlight = {highlight_types.WEB: ["<b>", "</b>"], highlight_types.TEXT: ["_", "_"]}
 
     def __str__(self):
         return f"state: {self.state}, position: {self.position},\
          text_version: {self.text_version} "
 
     def stringify(self, text: list, size_of_window: int, output):
-        type_of_highlight = highlight_types.web
+        type_of_highlight = highlight_types.WEB
         if output == print:
-            type_of_highlight = highlight_types.text
+            type_of_highlight = highlight_types.TEXT
 
-        list_of_text = [i for i in text]
+        list_of_text = [line for line in text]
         start_bold = self.position
         end_bold = min(self.position + size_of_window - 1, len(list_of_text) - 1)
         list_of_text[start_bold] = (
-            self.highlight[type_of_highlight.value][0] + list_of_text[start_bold]
+            self.highlight[type_of_highlight][0] + list_of_text[start_bold]
         )
         list_of_text[end_bold] = (
-            list_of_text[end_bold] + self.highlight[type_of_highlight.value][1]
+            list_of_text[end_bold] + self.highlight[type_of_highlight][1]
         )
 
         rewritten = ""
         if self.rewrite_to:
-            rewritten = f" | {self.rewrite_from} --> {self.rewrite_to}"
+            rewritten = f" | rewritten {''.join(self.rewrite_from)} --> {''.join(self.rewrite_to)}"
 
-        return ", ".join(list_of_text) + " | state: " + self.state + rewritten
+        return "".join(list_of_text) + " | state: " + self.state + rewritten
 
 
 class OutputMode(enum.Enum):
@@ -81,13 +77,14 @@ class BaseAutomaton:
     special_symbols = "#$*"
     configs = []
     special_instructions = ["MVL", "MVR", "[]"]
-    detail_of_output = OutputMode.INSTRUCTIONS
+    detail_of_output = None
     name = "Automaton"
     type = "RLWW"
     doc_string = ""
     instructions = {}
     output_stream = None
     texts = []
+    failed_configurations = []
 
     def __init__(self, file=""):
         if file:
@@ -248,6 +245,7 @@ class BaseAutomaton:
             self.log(
                 4, f"failed configuration {window} - {conf.state}, {conf.position}"
             )
+            self.failed_configurations.append(conf)
         return False
 
     def __get_window(self, text: str, position: int):
@@ -298,24 +296,31 @@ class BaseAutomaton:
             conf = self.configs.pop()
             window = self.__get_window(self.texts[conf.text_version], conf.position)
             if self.__move(window, conf):
-                self.log(2, f"remaining tuples = {self.configs}")
-                self.log(2, f"number of copies of text = {len(self.texts)}")
+                self.log(2, "history of computation")
                 self.pretty_printer(conf)
+                self.log(2, "accepted")
                 return True
+        self.log(2, "not accepted")
+        for conf in self.failed_configurations:
+            self.log(2, "failed branch of evaluation")
+            self.pretty_printer(conf)
         return False
 
-    def evaluate(
-        self, word, detail_of_output=logging.DEBUG, output_stream=print
-    ) -> bool:
-        logger.setLevel(detail_of_output)
+    def evaluate(self, word, detail_of_output=None, output_stream=print) -> bool:
+        if detail_of_output is None:
+            if self.detail_of_output is None:
+                self.detail_of_output = OutputMode.RESULT
+        else:
+            self.detail_of_output = detail_of_output
+
         self.output_stream = output_stream
 
         word = "#" + word + "$"
         self.texts = [self.__parse_text_to_list(word)]
         self.paths_of_stats = [[0]]
-        starting_status = configuration(self.initial_state, 0, 0)
-        self.configs = [starting_status]
-        self.log(2, self.texts[0])
+        starting_configuration = configuration(self.initial_state, 0, 0)
+        self.configs = [starting_configuration]
+        self.log(2, "evaluated word: " + "".join(self.texts[0]))
         return self.dfs_search()
 
     def print_instructions(self):

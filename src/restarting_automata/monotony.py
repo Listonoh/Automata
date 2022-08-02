@@ -59,6 +59,19 @@ def to_digraph(a: Automaton) -> Dict[str, List[str]]:
                 current_state = state + from_window
                 digraph[current_state] += valid_extensions
 
+    # edges from star
+    for state, transition_function in a.instructions.items():
+        for from_window, instructions in transition_function.items():
+            if "*" in from_window:
+                for instruction in instructions:
+                    for configuration in possible_states:
+                        if state == configuration[: len(state)]:
+                            from_window = configuration[len(state) :]
+                            valid_extensions = get_valid_extensions(
+                                a, possible_states, from_window, instruction
+                            )
+                            digraph[configuration] += valid_extensions
+
     return digraph
 
 
@@ -74,14 +87,16 @@ def get_valid_extensions(
         to_state = instruction[0]
         instruction = instruction[1]
         if instruction == "MVR":
-            rt = [
-                (symbol, to_state + next_window)
-                for symbol, next_window in get_next_window(a, from_window)
-                if to_state + next_window in possible_states
-            ]
-            if to_state + "['*']" in possible_states:
-                rt.append(("*", to_state + "['*']"))
+            rt = []
+            for symbol, next_window in get_next_window(a, from_window):
+                if to_state + "['*']" in possible_states:
+                    rt.append((symbol, to_state + next_window))
+                    possible_states.add(to_state + next_window)
+
+                elif to_state + next_window in possible_states:
+                    rt.append((symbol, to_state + next_window))
             return rt
+
         elif instruction == "MVL":
             raise Exception("Not supported two-way automata")
         elif re.match(r"^\[.*\]$", instruction):
@@ -89,6 +104,10 @@ def get_valid_extensions(
 
 
 def get_next_window(a: Automaton, from_window: str) -> List[Tuple[str, str]]:
+    """Takes automaton and window which may contain symbols or star and returns list of Edges"""
+    if from_window == "['*']":
+        """This is problematic becouse we don not know what symbols could be in window"""
+        return []
     window = ast.literal_eval(from_window)[1:]
     possible_symbols = a.alphabet + a.working_alphabet
     result = []
@@ -96,7 +115,7 @@ def get_next_window(a: Automaton, from_window: str) -> List[Tuple[str, str]]:
     if window[-1] == "$":
         result.append(("", str(window)))
     else:
-        possible_symbols + ["$"]
+        possible_symbols += ["$"]
 
     for c in possible_symbols:
         result.append((c, str(window + [c])))
@@ -119,8 +138,8 @@ def get_rewrite_windows(
         for possible_state in possible_states
         if incomplete_next_window in possible_state
     ]
-    if to_state + "['*']" in possible_states:
-        result.append(("*", to_state + "['*']"))
+    # if to_state + "['*']" in possible_states:
+    #     result.append(("*", to_state + "['*']"))
     return result
 
 
@@ -130,78 +149,3 @@ def from_digraph_to_dot(digraph: dict) -> Digraph:
         for label, to_state in digraph[from_state]:
             dot.edge(from_state, to_state, label)
     return dot
-
-
-# def can_restart(state):
-#     s = [state]
-#     visited = [state]
-#     possible_states = []
-#     while s:
-#         cur_state = s.pop()
-#         for window in a.instructions[cur_state]:
-#             for right_side in a.instructions[cur_state][window]:
-#                 if right_side == "Accept":
-#                     continue
-#                 if right_side == "Restart":
-#                     return True
-#                 if right_side[0] not in visited:
-#                     possible_states.append(right_side[0])
-#                     visited.append(right_side[0])
-#                     s.append(right_side[0])
-#     return False
-
-
-def generate_pre_complete_word(a: Automaton, content: list):
-    return []
-    final_length = a.size_of_window
-    for i in range(1, len(content)):
-        suffix = content[:i]
-        symbols_needed = final_length - len(suffix) - 1
-        perm = permutations(a.working_alphabet + a.alphabet, symbols_needed)
-        for p in perm:
-            for prefix in a.working_alphabet + a.alphabet + ["#"]:
-                yield [prefix] + list(p) + suffix
-
-
-def __could_be_rewrite_far_apart(digraph, a, rewrites):
-    reversed_digraph = defaultdict(list)
-    for key in digraph.keys():
-        for item in digraph[key]:
-            reversed_digraph[item].append(key)
-            reversed_digraph[key]  # mark as visited
-
-    used = {key: False for key in digraph.keys()}
-    for state in rewrites.keys():
-        st = [state]
-        distance = {i: 0 if i == state else -1 for i in reversed_digraph.keys()}
-        while st:
-            current = st.pop(0)
-            if distance[current] >= a.size_of_window and current in rewrites.keys():
-                return True
-            for next_state in reversed_digraph[current]:
-                if distance[current] == float("inf"):
-                    if not distance[next_state] == float("inf"):
-                        distance[next_state] = float("inf")
-                    else:
-                        continue  # don't loop to infinity
-                if distance[next_state] == -1:
-                    distance[next_state] = distance[current] + 1
-                else:
-                    distance[next_state] = float("inf")
-                st.append(next_state)
-
-
-def __could_be_rewrite_from_rewrite(digraph, a, rewrites):
-    accessible_from_initial = []
-    to_check_without_states = [i[2:] for i in digraph.keys()]
-    for i in digraph.keys():
-        for rewrite in rewrites[i]:
-            rewrite = rewrite["rewritten_to"]
-            for possible_bad_state in generate_pre_complete_word(a, rewrite):
-                if str(possible_bad_state) in to_check_without_states:
-                    # if possible_bad_state in accessible_from_initial:
-                    #     pass
-                    # if not silent:
-                    print(possible_bad_state, rewrite)
-                    return True
-    return False

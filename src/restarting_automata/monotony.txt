@@ -1,5 +1,5 @@
 definition:
-let have RRWW automaton [] A then A is monotonous iff for all acceptable words there are not 2 successive cycles with rewrite where the position of rewrite from the left sentinel is greater then in the previous cycle.
+let have RRWW automaton [] A then A is monotonous iff for all acceptable words there are not 2 successive cycles with rewrite where the position of rewrite from the right sentinel is greater then in the previous cycle.
 
 Proof from jancar99:
 In the paper he used set of words created from alphabet V of sufficient length such that all instructions would be used at least once. 
@@ -63,3 +63,65 @@ if we trace the rewritten window back and forward we get state that is accessibl
 then if there is rewrite further then difference between length of difference rewrite and rewritten window then the automaton can rewrite further from the left sentinel then the last rewrite,
  as such the automaton is not monotonous.
 If there does not exist such case then the automaton is monotonous.
+
+Why it allways go to the rewrite location?
+
+--------------------------------------------------------------
+# digraph algorithm 11.7.2022
+
+digraph with star in middle is problematic becouse it is not always possible to determine what is in window, it could happen that the star can represent only few windows.
+The windows that it could represent can be get from the edges that are connected to the star.
+But if multiple star are in the graph then it is exponential.
+So this is resolved separatedly after the graph is created.
+Example of such automaton: window is of length 3, and the autamotan only accepts words with "a" on odd positions and odd length.
+Then the graph is created as follows:
+s0 #a. -> s1 MVR
+s1 * -> s0 MVR
+s0 a.a -> s1 MVR 
+s1 .a$ -> Accept 
+s0 #a$ -> Accept
+
+I will take last configuration and if it is not star then i will try to make 2 MVR instructions.
+If it is star then I will reculsively select last configuration.
+
+another example is 
+same --//--
+s0 #bb -> s2 MVR
+s2 bbb -> s0 MVR
+s0 bbb -> s2 MVR
+s2 bb$ -> Accept
+
+the digraph should not have any edge between s0 with "bbb" and star. 
+
+state = s0
+window = "bbb"
+configuration = s0[#bb] (state[window])
+
+In the end i have gone with simple replacement of star with any configuration while adding the configuration into possible configurations of the automaton.
+But this force me to add one more cycle through the instructions to correctly connect the new configurations to the other configurations by edge.
+This is needed to be done after the first cycle is finished. 
+Becouse all of the possible configurations of the automaton are not known before the first cycle.
+
+so with this I can finaly test monotonicity of the automaton.
+
+let start with the simple case that rewrites are far away with non deterministic automaton.
+example of this can be correct pairs of brackets. with additional instruction for MVR if the brackets are paired.
+
+initial_state: q0
+alphabet: (, )
+working_alphabet: 
+size_of_window: 2
+name: brackets
+type: RLWW
+doc_string: This automaton 
+q0 #$ -> Accept
+q0 () -> qr []
+q0 () -> q0 MVR
+q0 (( -> q0 MVR
+q0 )( -> q0 MVR
+q0 )) -> q0 MVR
+q0 #( -> q0 MVR
+qr * -> Restart
+
+the digraph algorithm is broken again, this time with rewrites...
+there are now 2 edges to qr with in the graph of brackets...

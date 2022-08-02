@@ -35,6 +35,8 @@ class Automaton(BaseAutomaton):
             self.add_instruction_without_state(from_state, window, right_side[0])
         elif len(right_side) == 2:
             self.add_instruction(from_state, window, right_side[0], right_side[1])
+        else:
+            raise ValueError(f"Wrong instruction {line}")
 
     def __load_line(self, line: str):
         line = line.replace("\n", "")
